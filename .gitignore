@@ -61,5 +61,8 @@ target/
 #Ipython Notebook
 .ipynb_checkpoints
 
+#vim
+*.sw[op]
+
 #shh...it's a secret
 settings.py
