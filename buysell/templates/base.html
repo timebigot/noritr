@@ -10,86 +10,109 @@
         <link rel="shortcut icon" href="{%  static 'img/favicon.ico' %}">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
         <link rel="stylesheet" href="{% static 'css/base.css' %}">
         {% block index_style %}{% endblock %}
     </head>
 
     <body>
         <header>
-            {% if user.is_authenticated %}
-            Welcome, {{ user.get_username }}
-            <a href="{% url 'logout' %}" class="btn btn-primary">logout</a>
-            {% else %}
+            <div class="container">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <h4>Noritr</h4>
+                    </div><!--col-xs-6-->
+                    <div class="col-xs-6">
+                        <div class="pull-right">
+                            {% if user.is_authenticated %}
+                            <ul class="nav nav-pills">
+                                <li role="presentation" class="dropdown pull-left">
+                                    <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                                        {{ user.get_username }}
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li class="visible-xs"><a href="{% url 'create_post' %}">Post</a></li>
+                                        <li><a href="{% url 'logout' %}">Logout</a></li>
+                                    </ul>
+                                </li>
+                                <li role="presentation">
+                                    <a href="{% url 'create_post' %}" class="hidden-xs">POST</a>
+                                </li>
+                            </ul>
+                            {% else %}
 
-            <!-- Button trigger modal -->
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#signup">
-                Sign Up
-            </button>
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#login">
-                Log In
-            </button>
+                            <!-- Button trigger modal -->
+                            <ul class="nav nav-pills">
+                                <li role="presentation"><a href="#" data-toggle="modal" data-target="#login">Log In</a></li>
+                                <li role="presentation" class="hidden-xs"><a href="#" data-toggle="modal" data-target="#signup">Sign Up</a></li>
+                            </ul>
 
-            <!-- Modal -->
-            <div class="modal fade" id="signup" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-                <div class="modal-dialog modal-sm" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                            <h4 class="modal-title" id="myModalLabel">Sign Up</h4>
-                        </div>
-                        <div class="modal-body">
-                            <form action="/signup" method="POST">{% csrf_token %}
-                                <div class="form-group">
-                                    <input type="text" placeholder="Username" name="username" class="form-control" id="focus-signup">
+
+                            <!-- Modal -->
+                            <div class="modal fade" id="login" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                                <div class="modal-dialog modal-sm" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                            <h4 class="modal-title" id="myModalLabel">Log In</h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form action="{% url 'login' %}" method="POST">{% csrf_token %}
+                                                <div class="form-group">
+                                                    <input type="text" placeholder="Username" name="username" class="form-control" id="focus-login">
+                                                </div>
+                                                <div class="form-group">
+                                                    <input type="password" placeholder="Password" name="password" class="form-control">
+                                                </div>
+                                                <div class="form-group">
+                                                    <input type="submit" name="submit" value="LOGIN" class="form-control btn-success">
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="form-group">
-                                    <input type="text" placeholder="Email" name="email" class="form-control">
-                                </div>
-                                <div class="form-group">
-                                    <input type="password" placeholder="Password" name="password" class="form-control">
-                                </div>
-                                <div class="form-group">
-                                    <input type="submit" name="submit" value="Register" class="form-control btn-success">
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal fade" id="login" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-                <div class="modal-dialog modal-sm" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                            <h4 class="modal-title" id="myModalLabel">Log In</h4>
-                        </div>
-                        <div class="modal-body">
-                            <form action="{% url 'login' %}" method="POST">{% csrf_token %}
-                                <div class="form-group">
-                                    <input type="text" placeholder="Username" name="username" class="form-control" id="focus-login">
-                                </div>
-                                <div class="form-group">
-                                    <input type="password" placeholder="Password" name="password" class="form-control">
-                                </div>
-                                <div class="form-group">
-                                    <input type="submit" name="submit" value="LOGIN" class="form-control btn-success">
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        {% endif %}
+                            </div>
+                            <div class="modal fade" id="signup" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                                <div class="modal-dialog modal-sm" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                            <h4 class="modal-title" id="myModalLabel">Sign Up</h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form action="{% url 'signup' %}" method="POST">{% csrf_token %}
+                                                <div class="form-group">
+                                                    <input type="text" placeholder="Username" name="username" class="form-control" id="focus-signup">
+                                                </div>
+                                                <div class="form-group">
+                                                    <input type="text" placeholder="Email" name="email" class="form-control">
+                                                </div>
+                                                <div class="form-group">
+                                                    <input type="password" placeholder="Password" name="password" class="form-control">
+                                                </div>
+                                                <div class="form-group">
+                                                    <input type="submit" name="submit" value="REGISTER" class="form-control btn-success">
+                                                </div>
+                                            </form>
+                                        </div><!--modal-body-->
+                                    </div><!--modal-content-->
+                                </div><!--modal-dialog-->
+                            </div><!--modal-->
+                            {% endif %}
+                        </div><!--pull-right-->
+                    </div><!--col-xs-6-->
+                </div><!--row-->
+            </div><!--container-->
         </header>
-
         {% block content %}
         {% endblock %}
-
         <footer>
         </footer>
 
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
         <script src="{% static 'js/base.js' %}"></script>
+        {% block scripts %}
+        {% endblock %}
     </body>
 </html>

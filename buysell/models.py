@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.template.defaultfilters import slugify
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User)
@@ -11,7 +12,12 @@ class UserProfile(models.Model):
 class Category(models.Model):
     eng_name = models.CharField(max_length=20)
     kor_name = models.CharField(max_length=20)
+    slug = models.SlugField()
     days_til_expire = models.IntegerField(default=30)
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.eng_name)
+        super(Category, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.eng_name
@@ -35,27 +41,28 @@ class City(models.Model):
     state = models.ForeignKey(State, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.name
+        return '%s, %s' % (self.name, self.state)
 
 class Item(models.Model):
     title = models.CharField(max_length=50)
     price = models.CharField(max_length=10)
-    url_code = models.CharField(max_length=5)
-    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    details = models.CharField(max_length=250)
+    url_code = models.CharField(max_length=7)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     location = models.ForeignKey(City, on_delete=models.CASCADE)
     pub_date = models.DateField()
-    mod_date = models.DateField()
-    is_sold = models.BooleanField(default=0)
-    is_expired = models.BooleanField(default=0)
-    is_removed = models.BooleanField(default=0)
+    mod_date = models.DateField(blank=True, null=True)
+    is_sold = models.BooleanField(default=False)
+    is_expired = models.BooleanField(default=False)
+    is_removed = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.url_code
+        return '%s - %s' % (self.title, self.url_code)
 
 class ItemImage(models.Model):
     #location = models.ImageField(upload_to='item_images', blank=True)
-    is_primary = models.BooleanField(default=0)
+    is_primary = models.BooleanField(default=False)
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
 
     def __str__(self):
