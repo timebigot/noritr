@@ -103,10 +103,9 @@
                     </div><!--col-xs-6-->
                 </div><!--row-->
             </div><!--container-->
-
             {% load tags %}
-            {% get_cats as cats %}
-            {% get_areas as areas %}
+            {{ area }}
+            {{ cat }}
             <div class="container">
                 <div class="row">
                     <div class="col-xs-3">
@@ -116,12 +115,8 @@
                                 <span class="caret"></span>
                             </button>
                             <ul class="dropdown-menu" aria-labelledby="cat_menu">
-                                {% for cat in cats %}
-                                    {% if user.customer %}
+                                {% for cat in categories %}
                                 <li><a href="{% url 'list_cat' area=user.customer.area.slug category=cat.slug %}">{{ cat.kor_name }}</a></li>
-                                    {% else %}
-                                <li><a href="{% url 'list_cat' area='VA' category=cat.slug %}">{{ cat.kor_name }}</a></li>
-                                    {% endif %}
                                 {% endfor %}
                             </ul>
                         </div>
@@ -137,12 +132,7 @@
                     <div class="col-xs-3">
                         <div class="dropdown pull-right">
                             <button class="btn btn-default dropdown-toggle" type="button" id="area_menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                {% if user.is_authenticated %}
                                 {{ user.customer.area }}
-                                {% else %}
-                                
-                                {% endif %}
-
                                 <span class="caret"></span>
                             </button>
                             <ul class="dropdown-menu" aria-labelledby="area_menu">

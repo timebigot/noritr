@@ -2,13 +2,6 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.template.defaultfilters import slugify
 
-class UserProfile(models.Model):
-    user = models.OneToOneField(User)
-    #picture = models.ImageField(upload_to='profile_images', blank=True)
-    
-    def __str__(self):
-        return self.user.username
-
 class Category(models.Model):
     eng_name = models.CharField(max_length=20)
     kor_name = models.CharField(max_length=20)
@@ -24,6 +17,11 @@ class Category(models.Model):
 
 class Area(models.Model):
     name = models.CharField(max_length=10)
+    slug = models.SlugField()
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        super(Area, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.name
@@ -42,6 +40,14 @@ class City(models.Model):
 
     def __str__(self):
         return '%s, %s' % (self.name, self.state)
+
+class Customer(models.Model):
+    user = models.OneToOneField(User)
+    area = models.ForeignKey(Area, on_delete=models.CASCADE, default='')
+    #picture = models.ImageField(upload_to='profile_images', blank=True)
+    
+    def __str__(self):
+        return self.user.username
 
 class Item(models.Model):
     title = models.CharField(max_length=50)

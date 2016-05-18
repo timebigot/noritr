@@ -4,12 +4,15 @@
 <div class="container">
     <div class="row">
         {% for item in items %}
-        <div class="col-sm-4 col-md-3">
+        <div class="col-xs-6 col-sm-4 col-md-3">
             <div class="thumbnail">
-                <img src="{% static 'img/test.jpg' %}" alt="{{ item.title }}">
+                <a href="{% url 'post' url_code=item.url_code %}">
+                    <img src="{% static 'img/test.jpg' %}" alt="{{ item.title }}">
+                </a>
                 <div class="caption">
                     <p>{{ item.title }}</p>
-                    <p>{{ item.price }}</p>
+                    <p>${{ item.price }}</p>
+                    <p>{{ item.location }}</p>
                 </div>
             </div>
         </div>

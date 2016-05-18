@@ -1,0 +1,39 @@
+{{ user.username }}
+<div class="container">
+    <div class="row">
+        <div class="col-xs-3">
+            <div class="dropdown">
+                <button class="btn btn-default dropdown-toggle" type="button" id="cat_menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                    Categories
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="cat_menu">
+                    {% for cat in categories %}
+                    <li><a href="{% url 'list_cat' area=user.customer.area.slug category=cat.slug %}">{{ cat.kor_name }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <div class="col-xs-6">
+            <div class="input-group input-group-lg">
+                <input type="text" class="form-control" placeholder="Search for...">
+                <span class="input-group-btn">
+                    <button class="btn btn-default" type="button"><i class="material-icons">search</i></button>
+                </span>
+            </div><!-- /input-group -->
+        </div>
+        <div class="col-xs-3">
+            <div class="dropdown pull-right">
+                <button class="btn btn-default dropdown-toggle" type="button" id="area_menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                    {{ user.customer.area }}
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="area_menu">
+                    {% for area in areas %}
+                    <li><a href="{% url 'list_all' area=area.slug %}">{{ area.name }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>  
+        </div>
+    </div>
+</div>

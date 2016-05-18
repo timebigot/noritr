@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <form action="{% url 'signup' %}" method="POST">{% csrf_token %}
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" name="username" class="form-control" id="focus-signup">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="text" name="email" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" name="password" class="form-control">
+                </div>
+                <div class="form-group">
+                    <input type="submit" name="submit" value="REGISTER" class="btn btn-success">
+                </div>
+            </form>
+        </div>
+        <div class="col-md-6">
+            {% if next %}
+            <form action="{% url 'login' %}?next={{ next }}" method="POST">{% csrf_token %}
+            {% else %}
+            <form action="{% url 'login' %}" method="POST">{% csrf_token %}
+            {% endif %}
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" name="username" class="form-control" id="focus-login">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" name="password" class="form-control">
+                </div>
+                <div class="form-group">
+                    <input type="submit" name="submit" value="LOGIN" class="btn btn-success">
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
