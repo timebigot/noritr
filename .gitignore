@@ -66,3 +66,4 @@ target/
 
 #shh...it's a secret
 settings.py
+migrations
