@@ -1,15 +1,10 @@
 from django import template
-from buysell.models import Area, Category
+from buysell.models import Category
 
 register = template.Library()
 
 @register.simple_tag
-def get_areas():
-    areas = Area.objects.all()
-    return areas
-
-@register.simple_tag
 def get_cats():
-    cats = Category.objects.all()
+    cats = Category.objects.all().order_by('kor_name')
     return cats
 

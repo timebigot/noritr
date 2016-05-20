@@ -8,6 +8,9 @@ class CategoryAdmin(admin.ModelAdmin):
 class AreaAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('name',)}
 
+class CityAdmin(admin.ModelAdmin):
+    prepopulated_fields = {'slug': ('name',)}
+
 class CustomerInline(admin.StackedInline):
     model = Customer
     can_delete = False
@@ -23,6 +26,7 @@ admin.site.register(Customer)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Area, AreaAdmin)
 admin.site.register(State)
-admin.site.register(City)
+admin.site.register(City, CityAdmin)
 admin.site.register(Item)
 admin.site.register(ItemImage)
+admin.site.register(Zipcode)

@@ -29,21 +29,33 @@ class Area(models.Model):
 class State(models.Model):
     name = models.CharField(max_length=20)
     abbrev = models.CharField(max_length=2)
-    area = models.ForeignKey(Area, on_delete=models.CASCADE)
+    area = models.ForeignKey(Area, on_delete=models.CASCADE, related_name='states')
 
     def __str__(self):
         return self.abbrev
 
 class City(models.Model):
     name = models.CharField(max_length=20)
-    state = models.ForeignKey(State, on_delete=models.CASCADE)
+    state = models.ForeignKey(State, on_delete=models.CASCADE, related_name='cities')
+    slug = models.SlugField(default='')
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        super(City, self).save(*args, **kwargs)
 
     def __str__(self):
         return '%s, %s' % (self.name, self.state)
 
+class Zipcode(models.Model):
+    number = models.CharField(max_length=5)
+    city = models.ForeignKey(City, on_delete=models.CASCADE, related_name='zipcodes')
+
+    def __str__(self):
+        return '%s - %s' % (self.number, self.city)
+
 class Customer(models.Model):
     user = models.OneToOneField(User)
-    area = models.ForeignKey(Area, on_delete=models.CASCADE, default='')
+    zipcode = models.ForeignKey(Zipcode, on_delete=models.CASCADE)
     #picture = models.ImageField(upload_to='profile_images', blank=True)
     
     def __str__(self):
@@ -56,8 +68,8 @@ class Item(models.Model):
     url_code = models.CharField(max_length=7)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    location = models.ForeignKey(City, on_delete=models.CASCADE)
-    pub_date = models.DateField()
+    city = models.ForeignKey(City, on_delete=models.CASCADE, default='')
+    pub_date = models.DateTimeField()
     mod_date = models.DateField(blank=True, null=True)
     is_sold = models.BooleanField(default=False)
     is_expired = models.BooleanField(default=False)

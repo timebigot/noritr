@@ -66,4 +66,5 @@ target/
 
 #shh...it's a secret
 settings.py
+keys.py
 migrations
