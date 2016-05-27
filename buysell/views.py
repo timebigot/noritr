@@ -1,11 +1,16 @@
+import os
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
+from django.conf import settings
+from django.db.models import Q
 from django.utils import timezone
-from buysell.models import Category, Item, Area, City, State, Zipcode, Customer
-from buysell.helper import url_coder
+from buysell.models import Category, Item, ItemImage, Area, City, State, Zipcode, Customer
+from buysell.helper import url_coder, image_process
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
 
 def index(request):
     if request.user.is_authenticated():
@@ -16,12 +21,12 @@ def index(request):
     else:
         cities = City.objects.all()
 
-    items = Item.objects.filter(city__in=cities).order_by('-pub_date')
+    items_new = Item.objects.filter(city__in=cities).order_by('-pub_date')[:4]
 
-    return render(request, 'index.html', {'items': items})
+    return render(request, 'index.html', {'items_new': items_new})
 
 def join(request):
-    if request.user.is_authenticated:
+    if request.user.is_authenticated():
         return HttpResponseRedirect('/')
     else:
         if request.method == 'GET':
@@ -101,15 +106,58 @@ def post_process(request):
 
         item = Item(title=title, details=details, price=price, url_code=url_code, user=user, category=category, city=city, pub_date=pub_date)
         item.save()
-        return HttpResponseRedirect('/post/' + url_code)
+
+        if 'image' in request.FILES:
+            images = request.FILES.getlist('image')
+            number  = len(images)
+            
+            # image count limit is 8
+            if number <= 8:
+                for image in images:
+                    img_filename = image.name
+                    img_type = image.content_type
+                    img_size = len(image)
+
+                    # image types are jpg, png, gif
+                    if img_type == 'image/jpeg' or img_type == 'image/png' or img_type == 'image/gif':
+                        # image size limited to 5MB or 50M bytes
+                        if img_size <= 50000000:
+                            img_name = url_coder(size=11)
+                            img_ext = os.path.splitext(img_filename)[1].lower()
+                            img_filename = img_name + img_ext
+                            img_filepath = os.path.join(settings.MEDIA_ROOT, img_filename)
+                            default_storage.save(img_filepath, ContentFile(image.read()))
+
+                            img_db = ItemImage(title = img_name, location = img_filename, item=item)
+                            img_db.save()
+                        else:
+                            return HttpResponse('The image is too big')
+                    else:
+                        return HttpResponse('Appropriate filetypes are jpg, png, and gif')
+
+                return HttpResponseRedirect('/post/' + url_code)
+            else:
+                return HttpResponse('You may only upload up to 8 images')
+        else:
+            return HttpResponse('You need to add at least one image')
+
     else:
         # not a POST method
         return HttpResponseRedirect('/')
 
 def post(request, url_code):
     item = Item.objects.get(url_code=url_code)
+    images = ItemImage.objects.filter(item=item)
+    user = request.user
 
-    return render(request, 'post.html', {'item': item})
+    if request.user.is_authenticated():
+        try:
+            PostView.objects.get(item=item, user=user)
+        except PostView.DoesNotExist:
+            view = PostView(item=item, user=user)
+            view.save()
+
+    return render(request, 'post.html', {'item': item, 'images': images})
 
 def list(request, category=None, page=1):
     if request.user.is_authenticated():
@@ -124,12 +172,12 @@ def list(request, category=None, page=1):
         return HttpResponseRedirect('/list/all')
     elif category == 'all':
         items = Item.objects.filter(city__in=cities).order_by('-pub_date')
-        return render(request, 'index.html', {'items': items})
+        return render(request, 'list.html', {'items': items})
     else:
         try:
             category = Category.objects.get(slug=category)
             items = Item.objects.filter(category=category, city__in=cities).order_by('-pub_date')
-            return render(request, 'index.html', {'items': items})
+            return render(request, 'list.html', {'items': items})
         except Category.DoesNotExist:
             return HttpResponseRedirect('/')
 
@@ -148,3 +196,11 @@ def change_zip(request):
             return HttpResponseRedirect('/')
     else:
         return HttpResponseRedirect('/')
+
+def search(request):
+    items = ''
+    if request.method == 'GET':
+        query = request.GET.get('q')
+        items = Item.objects.filter(Q(title__icontains=query) | Q(details__icontains=query) | Q(category__eng_name__icontains=query) | Q(category__kor_name__icontains=query) | Q(user__username__icontains=query) | Q(city__name__icontains=query)).order_by('-pub_date')
+
+    return render(request, 'list.html', {'items': items})

@@ -36,12 +36,7 @@ class State(models.Model):
 
 class City(models.Model):
     name = models.CharField(max_length=20)
-    state = models.ForeignKey(State, on_delete=models.CASCADE, related_name='cities')
-    slug = models.SlugField(default='')
-
-    def save(self, *args, **kwargs):
-        self.slug = slugify(self.name)
-        super(City, self).save(*args, **kwargs)
+    state = models.ForeignKey(State, on_delete=models.CASCADE)
 
     def __str__(self):
         return '%s, %s' % (self.name, self.state)
@@ -55,7 +50,7 @@ class Zipcode(models.Model):
 
 class Customer(models.Model):
     user = models.OneToOneField(User)
-    zipcode = models.ForeignKey(Zipcode, on_delete=models.CASCADE)
+    zipcode = models.ForeignKey(Zipcode, on_delete=models.CASCADE, default='')
     #picture = models.ImageField(upload_to='profile_images', blank=True)
     
     def __str__(self):
@@ -68,8 +63,8 @@ class Item(models.Model):
     url_code = models.CharField(max_length=7)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    city = models.ForeignKey(City, on_delete=models.CASCADE, default='')
-    pub_date = models.DateTimeField()
+    city = models.ForeignKey(City, on_delete=models.CASCADE)
+    pub_date = models.DateField()
     mod_date = models.DateField(blank=True, null=True)
     is_sold = models.BooleanField(default=False)
     is_expired = models.BooleanField(default=False)
@@ -85,3 +80,10 @@ class ItemImage(models.Model):
 
     def __str__(self):
         return self.location
+
+class PostView(models.Model):
+    item = models.ForeignKey(Item, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return '%s - %s' % (self.item, self.user)
