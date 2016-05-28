@@ -7,10 +7,11 @@ from django.contrib.auth import authenticate, login, logout
 from django.conf import settings
 from django.db.models import Q
 from django.utils import timezone
-from buysell.models import Category, Item, ItemImage, Area, City, State, Zipcode, Customer
+from buysell.models import Category, Item, ItemImage, Area, City, State, Zipcode, Customer, PostView
 from buysell.helper import url_coder, image_process
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
+from PIL import Image
 
 def index(request):
     if request.user.is_authenticated():
@@ -21,7 +22,7 @@ def index(request):
     else:
         cities = City.objects.all()
 
-    items_new = Item.objects.filter(city__in=cities).order_by('-pub_date')[:4]
+    items_new = Item.objects.filter(city__in=cities).order_by('-pub_date')[:6]
 
     return render(request, 'index.html', {'items_new': items_new})
 
@@ -128,8 +129,24 @@ def post_process(request):
                             img_filepath = os.path.join(settings.MEDIA_ROOT, img_filename)
                             default_storage.save(img_filepath, ContentFile(image.read()))
 
-                            img_db = ItemImage(title = img_name, location = img_filename, item=item)
+                            img_db = ItemImage(name = img_filename, location = img_filename, item=item)
                             img_db.save()
+
+                            thumb = Image.open(img_filepath)
+                            W = thumb.size[0] / 2
+                            H = thumb.size[1] / 2
+
+                            filepath = os.path.join(settings.MEDIA_ROOT + '/thumbs/' + img_filename)
+
+                            if W > H:
+                                thumb = thumb.crop((W-H, H-H, W+H, H+H))
+                                thumb = thumb.resize((244,244))
+                            elif W < H:
+                                thumb = thumb.crop((W-W, H-W, W+W, H+W))
+                                thumb = thumb.resize((244,244))
+
+                            thumb.save(filepath)
+
                         else:
                             return HttpResponse('The image is too big')
                     else:

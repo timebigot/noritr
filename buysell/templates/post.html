@@ -1,5 +1,8 @@
 {% extends 'base.html' %}
 {% block content %}
+{% for image in item.itemimage_set.all %}
+<img src="/img/{{ image }}"><br>
+{% endfor %}
 {{ item.title }} <br>
 {{ item.details }} <br>
 {{ item.price }} <br>

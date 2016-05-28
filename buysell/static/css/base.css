@@ -1,3 +1,11 @@
 .material-icons {
     vertical-align: -14%;
 }
+
+.card {
+    padding: 5px;
+}
+
+.thumbnail {
+    padding: 1px;
+}

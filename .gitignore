@@ -68,3 +68,6 @@ target/
 settings.py
 keys.py
 migrations
+
+#development
+media

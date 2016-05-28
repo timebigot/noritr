@@ -36,7 +36,12 @@ class State(models.Model):
 
 class City(models.Model):
     name = models.CharField(max_length=20)
-    state = models.ForeignKey(State, on_delete=models.CASCADE)
+    state = models.ForeignKey(State, on_delete=models.CASCADE, related_name='cities')
+    slug = models.SlugField(default='')
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.state.abbrev + ' - ' + self.name)
+        super(City, self).save(*args, **kwargs)
 
     def __str__(self):
         return '%s, %s' % (self.name, self.state)
@@ -64,7 +69,7 @@ class Item(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     city = models.ForeignKey(City, on_delete=models.CASCADE)
-    pub_date = models.DateField()
+    pub_date = models.DateTimeField()
     mod_date = models.DateField(blank=True, null=True)
     is_sold = models.BooleanField(default=False)
     is_expired = models.BooleanField(default=False)
@@ -74,12 +79,13 @@ class Item(models.Model):
         return '%s - %s' % (self.title, self.url_code)
 
 class ItemImage(models.Model):
-    #location = models.ImageField(upload_to='item_images', blank=True)
+    location = models.FileField(default='')
+    name = models.CharField(max_length=16, default='')
     is_primary = models.BooleanField(default=False)
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.location
+        return self.name
 
 class PostView(models.Model):
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
