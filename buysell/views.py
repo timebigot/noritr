@@ -12,6 +12,7 @@ from buysell.helper import url_coder, image_process
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from PIL import Image
+from django.core.paginator import Paginator
 
 def index(request):
     if request.user.is_authenticated():
@@ -177,6 +178,7 @@ def post(request, url_code):
     return render(request, 'post.html', {'item': item, 'images': images})
 
 def list(request, category=None, page=1):
+    print(page)
     if request.user.is_authenticated():
         zipcode = request.user.customer.zipcode.number
         area = Zipcode.objects.get(number=zipcode).city.state.area.slug
@@ -185,18 +187,28 @@ def list(request, category=None, page=1):
     else:
         cities = City.objects.all()
 
+    cat = 'all'
     if not category:
         return HttpResponseRedirect('/list/all')
     elif category == 'all':
-        items = Item.objects.filter(city__in=cities).order_by('-pub_date')
-        return render(request, 'list.html', {'items': items})
+        item_list = Item.objects.filter(city__in=cities).order_by('-pub_date')
     else:
         try:
             category = Category.objects.get(slug=category)
-            items = Item.objects.filter(category=category, city__in=cities).order_by('-pub_date')
-            return render(request, 'list.html', {'items': items})
+            cat = category.slug
+            item_list = Item.objects.filter(category=category, city__in=cities).order_by('-pub_date')
         except Category.DoesNotExist:
             return HttpResponseRedirect('/')
+
+    paginator = Paginator(item_list, 24)
+    try:
+        items = paginator.page(page)
+    except PageNotAnInteger:
+        items = paginator.page(1)
+    except EmptyPage:
+        items = paginator.page(1)
+
+    return render(request, 'list.html', {'items': items, 'category': category})
 
 def change_zip(request):
     if request.method == 'POST':

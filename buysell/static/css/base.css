@@ -1,11 +1,53 @@
+a {
+    color: black;
+}
 .material-icons {
     vertical-align: -14%;
 }
 
+/* header */
+header {
+    margin-bottom: 10px;
+}
+
+/* navbar-main */
+.navbar-main {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+.zip-change {
+    margin-top: 10px;
+}
+.search {
+    margin-top: 3px;
+}
+.btn-post {
+    margin-top: 2px;
+}
+.navbar-border {
+    margin: 0px;
+}
+
+/* navbar-cat */
+.navbar-cats {
+    padding: 0px;
+}
+
+/* cards */
 .card {
     padding: 5px;
 }
-
 .thumbnail {
     padding: 1px;
+}
+.thumbnail .caption {
+    padding-bottom: 0px;
+}
+.caption .title {
+    height: 40px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
 }

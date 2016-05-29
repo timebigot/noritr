@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% block title %}{{ category|title }}{% endblock %}
 {% block content %}
 {% load staticfiles %}
 <div class="container">
@@ -14,7 +15,7 @@
                     {% endif %}
                 </a>
                 <div class="caption">
-                    <p>{{ item.title }}</p>
+                    <p class="title">{{ item.title }}</p>
                     <p>${{ item.price }}</p>
                     <p>{{ item.city }}</p>
                 </div>
@@ -23,4 +24,45 @@
         {% endfor %}
     </div>
 </div>
+<nav align="center">
+    <ul class="pagination pagination-lg">
+        {% if items.has_previous %}
+        <li>
+            <a href="/list/{{ category|lower }}/{{ items.previous_page_number }}">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+        {% else %}
+        <li class="disabled">
+            <a>
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+        {% endif %}
+
+        <li class="disabled">
+            <a>
+                {% if items.number %}
+                {{ items.number }}
+                {% else %}
+                1
+                {% endif %}
+            </a>
+        </li>
+
+        {% if items.has_next %}
+        <li>
+            <a href="/list/{{ category }}/{{ items.next_page_number }}">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+        {% else %}
+        <li class="disabled">
+            <a>
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
 {% endblock %}

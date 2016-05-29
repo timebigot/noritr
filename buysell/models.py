@@ -64,7 +64,7 @@ class Customer(models.Model):
 class Item(models.Model):
     title = models.CharField(max_length=50)
     price = models.CharField(max_length=10)
-    details = models.CharField(max_length=250)
+    details = models.TextField(max_length=2000)
     url_code = models.CharField(max_length=7)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)

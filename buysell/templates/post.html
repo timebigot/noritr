@@ -1,13 +1,47 @@
 {% extends 'base.html' %}
+{% block title %}{{ item.title }}{% endblock %}
 {% block content %}
-{% for image in item.itemimage_set.all %}
-<img src="/img/{{ image }}"><br>
-{% endfor %}
-{{ item.title }} <br>
-{{ item.details }} <br>
-{{ item.price }} <br>
-{{ item.category }} <br>
-{{ item.user }} <br>
-{{ item.city }} <br>
-{{ item.pub_date }} <br>
+{% load staticfiles %}
+
+<div class="container">
+    <h2>{{ item.title }} <span class="label label-warning pull-right">${{ item.price }}</span></h2>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <br>
+            {% if item.itemimage_set.all %}
+            <img src="/img/{{ item.itemimage_set.all.first }}" class="img-responsive" alt="{{ item.title }}">
+            {% else %}
+            <img src="{% static 'img/test.jpg' %}" class="img-responsive" alt="{{ item.title }}">
+            {% endif %}
+        </div>
+        <div class="col-md-4">
+            <br>
+            <button type="button" class="btn btn-success btn-lg btn-block">Contact Seller</button>
+            <br>
+            <ul class="list-group">
+                <li class="list-group-item">
+                    <strong>Details:</strong>
+                    {{ item.details|linebreaks }}
+                </li>
+            </ul>
+            <ul class="list-group">
+                <li class="list-group-item">
+                    <strong>Seller:</strong>
+                    <p class="pull-right">{{ item.user }}</p>
+                </li> 
+                <li class="list-group-item">
+                    <strong>Location:</strong>
+                    <p class="pull-right">{{ item.city }}</p>
+                </li> 
+                <li class="list-group-item">
+                    <strong>Category:</strong>
+                    <p class="pull-right">{{ item.category }}</p>
+                </li> 
+            </ul>
+        </div>
+    </div>
+</div>
 {% endblock %}
