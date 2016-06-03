@@ -4,18 +4,22 @@
 {% load staticfiles %}
 
 <div class="container">
-    <h2>{{ item.title }} <span class="label label-warning pull-right">${{ item.price }}</span></h2>
+    <h2>{{ item.title }} <span class="label label-danger pull-right">${{ item.price }}</span></h2>
 </div>
 
 <div class="container">
     <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-8" align="center">
             <br>
+            <div class="fotorama" data-nav="thumbs" data-fit="contain">
             {% if item.itemimage_set.all %}
-            <img src="/img/{{ item.itemimage_set.all.first }}" class="img-responsive" alt="{{ item.title }}">
+                {% for image in item.itemimage_set.all %}
+                <img src="/img/{{ image }}" class="img-responsive" alt="{{ item.title }}">
+                {% endfor %}
             {% else %}
-            <img src="{% static 'img/test.jpg' %}" class="img-responsive" alt="{{ item.title }}">
+                <img src="{% static 'img/test.jpg' %}" class="img-responsive" alt="{{ item.title }}">
             {% endif %}
+            </div>
         </div>
         <div class="col-md-4">
             <br>
@@ -38,7 +42,7 @@
                 </li> 
                 <li class="list-group-item">
                     <strong>Category:</strong>
-                    <p class="pull-right">{{ item.category }}</p>
+                    <p class="pull-right">{{ item.category.kor_name }}</p>
                 </li> 
             </ul>
         </div>

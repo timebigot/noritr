@@ -11,6 +11,7 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+        <link  href="http://cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.css" rel="stylesheet">
         <link rel="stylesheet" href="{% static 'css/base.css' %}">
         {% block index_style %}{% endblock %}
     </head>
@@ -43,7 +44,7 @@
                                             <div class="modal-body">
                                                 <form action="{% url 'change_zip' %}" method="POST">{% csrf_token %}
                                                     <div class="input-group">
-                                                        <input type="number" class="form-control" placeholder="Enter a valid zipcode" name="zipcode">
+                                                        <input type="number" class="form-control" placeholder="Enter a valid zipcode" name="zipcode" min="1000" max="99999">
                                                         <span class="input-group-btn">
                                                             <button class="btn btn-success" type="submit">Update</button>
                                                         </span>
@@ -110,6 +111,7 @@
         </footer>
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+        <script src="http://cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.js"></script>
         <script src="{% static 'js/base.js' %}"></script>
 
         {% block scripts %}

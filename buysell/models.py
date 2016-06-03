@@ -71,6 +71,7 @@ class Item(models.Model):
     city = models.ForeignKey(City, on_delete=models.CASCADE)
     pub_date = models.DateTimeField()
     mod_date = models.DateField(blank=True, null=True)
+    is_free = models.BooleanField(default=False)
     is_sold = models.BooleanField(default=False)
     is_expired = models.BooleanField(default=False)
     is_removed = models.BooleanField(default=False)
@@ -93,3 +94,13 @@ class PostView(models.Model):
 
     def __str__(self):
         return '%s - %s' % (self.item, self.user)
+
+class Message(models.Model):
+    sender = models.ForeignKey(User, on_delete=models.CASCADE)
+    receiver = models.ForeignKey(User, on_delete=models.CASCADE)
+    content = models.TextField(max_length=1000)
+    pub_date = models.DateTimeField()
+    is_read = models.BooleanField(default=False)
+
+    def __str__(self):
+        return '%s to %s' % (self.sender, self.receiver)

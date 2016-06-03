@@ -1,4 +1,5 @@
 import os
+import random
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
@@ -12,7 +13,7 @@ from buysell.helper import url_coder, image_process
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from PIL import Image
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
 def index(request):
     if request.user.is_authenticated():
@@ -23,9 +24,10 @@ def index(request):
     else:
         cities = City.objects.all()
 
-    items_new = Item.objects.filter(city__in=cities).order_by('-pub_date')[:6]
+    items_new = Item.objects.filter(city__in=cities).order_by('-pub_date')[:12]
+    items_rand = Item.objects.filter(city__in=cities).order_by('?')[:6]
 
-    return render(request, 'index.html', {'items_new': items_new})
+    return render(request, 'index.html', {'items_new': items_new, 'items_rand': items_rand})
 
 def join(request):
     if request.user.is_authenticated():
@@ -204,9 +206,9 @@ def list(request, category=None, page=1):
     try:
         items = paginator.page(page)
     except PageNotAnInteger:
-        items = paginator.page(1)
+        return HttpResponseRedirect('/')
     except EmptyPage:
-        items = paginator.page(1)
+        return HttpResponseRedirect('/')
 
     return render(request, 'list.html', {'items': items, 'category': category})
 

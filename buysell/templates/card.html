@@ -1,0 +1,21 @@
+{% load staticfiles %}
+{% load tags %}
+<div class="col-xs-6 col-sm-3 col-md-2 card">
+    <div class="thumbnail">
+        <a href="{% url 'post' url_code=item.url_code %}">
+            {% if item.itemimage_set.all %}
+            <img src="/img/thumbs/{{ item.itemimage_set.all.first }}" alt="{{ item.title }}">
+            {% else %}
+            <img src="{% static 'img/test.jpg' %}" alt="{{ item.title }}">
+            {% endif %}
+        </a>
+        <div class="caption">
+            <p class="title">{{ item.title }}</p>
+            <span class="label label-danger">${{ item.price }}</span>
+            {% if item.pub_date|new_item %}
+            <span class="label label-success">FRESH</span>
+            {% endif %}
+            <p>{{ item.city }}</p>
+        </div>
+    </div>
+</div>
