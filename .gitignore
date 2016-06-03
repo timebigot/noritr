@@ -71,3 +71,7 @@ migrations
 
 #development
 media
+
+#test bot
+bot
+parser.py
