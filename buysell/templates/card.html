@@ -11,7 +11,11 @@
         </a>
         <div class="caption">
             <p class="title">{{ item.title }}</p>
+            {% if item.is_free %}
+            <span class="label label-warning">FREE</span>
+            {% else %}
             <span class="label label-danger">${{ item.price }}</span>
+            {% endif %}
             {% if item.pub_date|new_item %}
             <span class="label label-success">FRESH</span>
             {% endif %}

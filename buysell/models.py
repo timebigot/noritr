@@ -96,11 +96,10 @@ class PostView(models.Model):
         return '%s - %s' % (self.item, self.user)
 
 class Message(models.Model):
-    sender = models.ForeignKey(User, on_delete=models.CASCADE)
-    receiver = models.ForeignKey(User, on_delete=models.CASCADE)
-    content = models.TextField(max_length=1000)
-    pub_date = models.DateTimeField()
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sender')
+    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='recipient')
+    content = models.TextField(max_length=250)
     is_read = models.BooleanField(default=False)
 
     def __str__(self):
-        return '%s to %s' % (self.sender, self.receiver)
+        return '%s to %s' % (self.sender, self.recipient)
