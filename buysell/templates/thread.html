@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}
+
+{% endblock %}
+{% block content %}
+{% load humanize %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            {% include 'inbox_sidebar.html' %}
+        </div>
+        <div class="col-md-9">
+            <ul class="list-group">
+                {% for msg in messages %}
+                <li class="list-group-item">
+                    <div class="media">
+                        <div class="media-body">
+                            <div class="row">
+                                <div class="col-xs-6">
+                                <p>{{ msg.sender }}</p>
+                                </div>
+                                <div class="col-xs-6">
+                                <p class="pull-right">{{ msg.pub_date|naturaltime }}</p>
+                                </div>
+                            </div>
+                            <p>{{ msg.content }}</p>
+                        </div>
+                    </div>
+                </li>
+                {% endfor %}
+                <li class="list-group-item compose-box">
+                    <p>{{ request.user.username }}</p>
+                    <form method="POST" action="{% url 'message' %}"> {% csrf_token %}
+                        <textarea class="form-control" rows="7" name="message"></textarea>
+                        <br>
+                        <div>
+                            <input type="hidden" name="recipient" value="{{ sender }}">
+                            <input type="hidden" name="item" value="{{ item_url }}">
+                            <input type="hidden" name="url_code" value="{{ url_code }}">
+                            <input class="btn btn-primary pull-right" name="submit" type="submit" value="Send">
+                        </div>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

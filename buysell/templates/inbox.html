@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Inbox
+{% endblock %}
+{% block content %}
+{% load tags %}
+{% load humanize %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            {% include 'inbox_sidebar.html' %}
+        </div>
+        <div class="col-md-9">
+            <ul class="list-group">
+                {% for msg in messages %}
+                {% with msg=msg.url_code|inbox %}
+                <li class="list-group-item{% if not msg.is_read %} list-group-item{% endif %}">
+                    <div class="media">
+                        <div class="media-left">
+                            <a href="{% url 'thread' msg.url_code %}">
+                                <img class="media-object inbox-media" src="/img/thumbs/{{ msg.item.itemimage_set.first }}" alt="{{ msg.url_code }}">
+                            </a>
+                        </div>
+                        <div class="media-body">
+                            <a href="{% url 'thread' msg.url_code %}"><b class="media-heading">{{ msg.item.title }}</b></a>
+                            <p>{{ msg.sender }} - {{ msg.pub_date|naturaltime }}</p>
+                            <p>{{ msg.content }}</p>
+                        </div>
+                    </div>
+                </li>
+                {% endwith %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
