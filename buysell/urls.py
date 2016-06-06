@@ -15,6 +15,9 @@ urlpatterns = [
     url(r'^post/(?P<url_code>\w{7})/$', views.post, name='post'),
     url(r'^list/(?P<category>[-\w]+)/$', views.list, name='list_cat'),
     url(r'^list/(?P<category>[-\w]+)/(?P<page>\d+)/$', views.list, name='list_cat_page'),
+    url(r'^message/$', views.message, name='message'),
+    url(r'^inbox/$', views.inbox, name='inbox'),
+    url(r'^inbox/(?P<url_code>\w+)/$', views.inbox, name='thread'),
 ]
 
 if settings.DEBUG:

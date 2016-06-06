@@ -10,14 +10,19 @@
             {% endif %}
         </a>
         <div class="caption">
-            <p class="title">{{ item.title }}</p>
-            {% if item.is_free %}
+            <a href="{% url 'post' url_code=item.url_code %}">
+                <p class="title">{{ item.title }}</p>
+            </a>
+            {% if item.is_sold %}
+            <span class="label label-danger">SOLD</span>
+            {% elif item.price == '0' %}
             <span class="label label-warning">FREE</span>
             {% else %}
-            <span class="label label-danger">${{ item.price }}</span>
+            <span class="label label-primary">${{ item.price }}</span>
             {% endif %}
+
             {% if item.pub_date|new_item %}
-            <span class="label label-success">FRESH</span>
+            <span class="label label-success">NEW</span>
             {% endif %}
             <p>{{ item.city }}</p>
         </div>

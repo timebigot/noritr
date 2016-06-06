@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.template.defaultfilters import slugify
+from datetime import datetime
 
 class Category(models.Model):
     eng_name = models.CharField(max_length=20)
@@ -70,10 +71,7 @@ class Item(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     city = models.ForeignKey(City, on_delete=models.CASCADE)
     pub_date = models.DateTimeField()
-    mod_date = models.DateField(blank=True, null=True)
-    is_free = models.BooleanField(default=False)
     is_sold = models.BooleanField(default=False)
-    is_expired = models.BooleanField(default=False)
     is_removed = models.BooleanField(default=False)
 
     def __str__(self):
@@ -99,7 +97,10 @@ class Message(models.Model):
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sender')
     recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='recipient')
     content = models.TextField(max_length=250)
+    item = models.ForeignKey(Item, on_delete=models.CASCADE)
+    pub_date = models.DateTimeField(default=datetime.now)
     is_read = models.BooleanField(default=False)
+    url_code = models.CharField(max_length=9, default='')
 
     def __str__(self):
-        return '%s to %s' % (self.sender, self.recipient)
+        return '%s - %s: %s' % (self.item.url_code, self.sender, self.content)

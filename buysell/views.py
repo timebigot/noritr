@@ -8,12 +8,14 @@ from django.contrib.auth import authenticate, login, logout
 from django.conf import settings
 from django.db.models import Q
 from django.utils import timezone
-from buysell.models import Category, Item, ItemImage, Area, City, State, Zipcode, Customer, PostView
+from buysell.models import Category, Item, ItemImage, Area, City, State, Zipcode, Customer, PostView, Message
 from buysell.helper import url_coder, image_process
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from PIL import Image
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from datetime import datetime, timedelta
+from django.db.models import Count, Max
 
 def index(request):
     if request.user.is_authenticated():
@@ -24,8 +26,9 @@ def index(request):
     else:
         cities = City.objects.all()
 
-    items_new = Item.objects.filter(city__in=cities).order_by('-pub_date')[:12]
-    items_rand = Item.objects.filter(city__in=cities).order_by('?')[:6]
+    one_day = datetime.now() - timedelta(hours=24)
+    items_new = Item.objects.filter(city__in=cities, is_sold=False).order_by('-pub_date')[:12]
+    items_rand = Item.objects.filter(city__in=cities, pub_date__lte=one_day).order_by('?')[:6]
 
     return render(request, 'index.html', {'items_new': items_new, 'items_rand': items_rand})
 
@@ -124,7 +127,7 @@ def post_process(request):
 
                     # image types are jpg, png, gif
                     if img_type == 'image/jpeg' or img_type == 'image/png' or img_type == 'image/gif':
-                        # image size limited to 5MB or 50M bytes
+                        # image size limited to 5MB
                         if img_size <= 50000000:
                             img_name = url_coder(size=11)
                             img_ext = os.path.splitext(img_filename)[1].lower()
@@ -193,12 +196,14 @@ def list(request, category=None, page=1):
     if not category:
         return HttpResponseRedirect('/list/all')
     elif category == 'all':
-        item_list = Item.objects.filter(city__in=cities).order_by('-pub_date')
+        item_list = Item.objects.filter(city__in=cities, is_sold=False).order_by('-pub_date')
+    elif category == 'free':
+        item_list = Item.objects.filter(city__in=cities, price='0', is_sold=False).order_by('-pub_date')
     else:
         try:
             category = Category.objects.get(slug=category)
             cat = category.slug
-            item_list = Item.objects.filter(category=category, city__in=cities).order_by('-pub_date')
+            item_list = Item.objects.filter(category=category, city__in=cities, is_sold=False).order_by('-pub_date')
         except Category.DoesNotExist:
             return HttpResponseRedirect('/')
 
@@ -234,4 +239,60 @@ def search(request):
         query = request.GET.get('q')
         items = Item.objects.filter(Q(title__icontains=query) | Q(details__icontains=query) | Q(category__eng_name__icontains=query) | Q(category__kor_name__icontains=query) | Q(user__username__icontains=query) | Q(city__name__icontains=query)).order_by('-pub_date')
 
-    return render(request, 'list.html', {'items': items})
+    return render(request, 'list.html', {'items': items, 'search': query})
+
+def message(request):
+    if request.method == 'POST':
+        content = request.POST.get('message')
+        sender = request.user
+        sender = User.objects.get(username = sender)
+        recipient = request.POST.get('recipient')
+        recipient = User.objects.get(username = recipient)
+        code = request.POST.get('item')
+        item = Item.objects.get(url_code = code)
+
+        m= Message.objects
+
+        if m.filter(item=item, sender=sender):
+            msg_code = url_code
+        elif m.filter(item=item, recipient=recipient):
+            msg_code = url_code
+        else:
+            msg_code = url_coder(size=9)
+
+        msg = Message(sender = sender, recipient = recipient, content = content, item = item, url_code=msg_code)
+        msg.save()
+
+        if request.POST.get('url_code'):
+            return HttpResponseRedirect('/inbox/' + msg_code)
+        else:
+            return HttpResponseRedirect('/post/' + code)
+    else:
+        return HttpResponseRedirect('/')
+
+def inbox(request, url_code=None):
+    if request.user.is_authenticated:
+        user = request.user
+        if Message.objects.filter(url_code=url_code):
+            messages = Message.objects.filter(url_code=url_code)
+            sender_pk = messages.values('sender').distinct()[0]['sender']
+            sender = User.objects.get(pk=sender_pk)
+            item_pk = messages.values('item').distinct()[0]['item']
+            item_url = Item.objects.get(pk=item_pk).url_code
+
+            return render(request, 'thread.html', {'messages':messages, 'sender':sender, 'item_url':item_url, 'url_code':url_code})
+        else:
+            if url_code == None:
+                messages = Message.objects.values('url_code').annotate(date=Max('pub_date')).order_by('-date').filter(Q(sender=user)|Q(recipient=user))
+                return render(request, 'inbox.html', {'messages':messages})
+            elif url_code == 'unread':
+                messages = Message.objects.values('url_code').annotate(date=Max('pub_date')).order_by('-date').filter(is_read=False)
+                return render(request, 'inbox.html', {'messages':messages})
+            elif url_code == 'sent':
+                messages = Message.objects.values('url_code').annotate(date=Max('pub_date')).order_by('-date').filter(sender=user)
+                return render(request, 'inbox.html', {'messages':messages})
+            else:
+                return HttpResponseRedirect('/inbox')
+    else:
+        return HttpResponseRedirect('/')
+

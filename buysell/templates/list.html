@@ -1,5 +1,12 @@
 {% extends 'base.html' %}
-{% block title %}{{ category|title }}{% endblock %}
+{% block title %}
+{% if category %}
+{{ category|title }}
+{% else %}
+{{ search }}
+{% endif %}
+{% endblock %}
+
 {% block content %}
 {% load staticfiles %}
 {% load tags %}

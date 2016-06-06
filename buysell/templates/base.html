@@ -18,23 +18,23 @@
 
     <body>
         <header class="hidden-sm hidden-xs">
-            <div class="container navbar-main">
+            <div class="container-fluid navbar-main">
                 <div class="row">
                     <div class="col-xs-3">
                         <div class="row">
-                            <div class="col-xs-6">
+                            <div class="col-xs-4">
                                 <a href="/"><h4>4989</h4></a>
                             </div>
-                            <div class="col-xs-6 zip-change">
+                            <div class="col-xs-8 zip-change">
                                 {% if user.customer.zipcode.city %}
-                                <a href="" data-toggle="modal" data-target="#myModal">
+                                <a href="" data-toggle="modal" data-target="#changeZip">
                                     <i class="fa fa-map-marker" aria-hidden="true"></i> 
                                     {{ user.customer.zipcode.city }}
                                 </a>
                                 {% else %}
                                 <a href="{% url 'join' %}"><i class="fa fa-map-marker" aria-hidden="true"></i> Everywhere </a>
                                 {% endif %}
-                                <div class="modal fade" tabindex="-1" role="dialog" id="myModal">
+                                <div class="modal fade" tabindex="-1" role="dialog" id="changeZip">
                                     <div class="modal-dialog modal-sm">
                                         <div class="modal-content">
                                             <div class="modal-header">
@@ -46,7 +46,7 @@
                                                     <div class="input-group">
                                                         <input type="number" class="form-control" placeholder="Enter a valid zipcode" name="zipcode" min="1000" max="99999">
                                                         <span class="input-group-btn">
-                                                            <button class="btn btn-success" type="submit">Update</button>
+                                                            <button class="btn btn-primary" type="submit">Update</button>
                                                         </span>
                                                     </div><!-- /input-group -->
                                                 </form>
@@ -76,7 +76,7 @@
                                         {{ user.username }} <span class="caret"></span>
                                     </a>
                                     <ul class="dropdown-menu dropdown-menu-right">
-                                        <li><a href=""><i class="fa fa-envelope-o" aria-hidden="true"></i> MESSAGES</a></li>
+                                        <li><a href="{% url 'inbox' %}"><i class="fa fa-envelope-o" aria-hidden="true"></i> MESSAGES</a></li>
                                         <li><a href=""><i class="fa fa-shopping-basket" aria-hidden="true"></i> MY STORE</a></li>
                                         <li><a href=""><i class="fa fa-cog" aria-hidden="true"></i> SETTINGS</a></li>
                                         <li role="separator" class="divider"></li>
@@ -86,7 +86,7 @@
                                 {% else %}
                                 <li role="presentation"><a href="{% url 'join' %}">JOIN</a></li>
                                 {% endif %}
-                                <a href="{% url 'post_create' %}" class="btn btn-success btn-post" role="button">POST</a>
+                                <a href="{% url 'post_create' %}" class="btn btn-primary btn-post" role="button">POST</a>
                             </ul>
                         </div><!--pull-right-->
                     </div><!--col-xs-3-->
@@ -108,6 +108,10 @@
         {% block content %}
         {% endblock %}
         <footer>
+            <hr>
+            <div class="container-fluid">
+                <p align="center">&copy; {% now "Y"%}, Noritr.com</p>
+            </div>
         </footer>
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>

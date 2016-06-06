@@ -1,5 +1,5 @@
 from django import template
-from buysell.models import Category
+from buysell.models import Category, Message
 from django.utils.dateformat import format
 import time
 
@@ -21,3 +21,8 @@ def new_item(pub_date):
        return True
     else:
         return False
+
+@register.filter
+def inbox(url_code):
+    msg = Message.objects.filter(url_code=url_code).latest('pub_date')
+    return msg
