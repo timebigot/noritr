@@ -4,4 +4,68 @@ Settings
 {% endblock %}
 
 {% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <h3>Basic Information</h3>
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <form class="form-horizontal" action="{% url 'settings' %}" method="POST"> {% csrf_token %}
+                        <div class="form-group">
+                            <label class="col-sm-2" for="username">Username</label>
+                            <div class="col-sm-10">
+                                <p>{{ request.user.username }}</p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2" for="email">Email</label>
+                            <div class="col-sm-10">
+                                <input type="email" name="email" class="form-control" id="email" value="{{ request.user.email }}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2" for="zipcode">Zipcode</label>
+                            <div class="col-sm-10">
+                                <input type="number" name="zipcode" class="form-control" id="zipcode" value="{{ request.user.customer.zipcode.number }}">
+                            </div>
+                        </div>
+                        <div class="pull-right">
+                            <input class="btn btn-primary" type="submit" name="profile" value="Update">
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <br>
+            <h3>Password Change</h3>
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <form class="form-horizontal" action="{% url 'settings' %}" method="POST"> {% csrf_token %}
+                        <div class="form-group">
+                            <label class="col-sm-2" for="pass_cur">Current Password</label>
+                            <div class="col-sm-10">
+                                <input type="password" name="pass_cur" class="form-control" id="pass_cur">
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="form-group">
+                            <label class="col-sm-2" for="pass_new">New Password</label>
+                            <div class="col-sm-10">
+                                <input type="password" name="pass_new" class="form-control" id="pass_new">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2" for="pass_conf">Confirm Password</label>
+                            <div class="col-sm-10">
+                                <input type="password" name="pass_conf" class="form-control" id="pass_conf">
+                            </div>
+                        </div>
+                        <div class="pull-right">
+                            <input class="btn btn-primary" type="submit" name="password" value="Change">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

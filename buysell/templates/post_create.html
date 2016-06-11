@@ -4,101 +4,103 @@
 <div class="container">
     <div class="row">
         <div class="col-md-6 col-md-offset-3">
-            <form class="form-horizontal" action="{% url 'post_process' %}" method="POST" enctype="multipart/form-data">
-
-                {% csrf_token %}
-
-                <div class="form-group">
-                    <label class="col-sm-2" for="title">Title</label>
-                    <div class="col-sm-10">
-                        <input type="text" name="title" class="form-control" id="title" maxlength="50" value="{{ item.title }}" autofocus>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="col-sm-2" for="details">Details</label>
-                    <div class="col-sm-10">
-                        <textarea name="details" rows="5" class="form-control" id="details">{{ item.details }}</textarea>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="col-sm-2" for="price">Price</label>
-                    <div class="col-sm-4">
-                        <div class="input-group">
-                            <span class="input-group-addon">$</span>
-                            <input type="number" class="form-control" id="price" name="price" value="{{ item.price }}">
+            <h3>Create Post</h3>
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <form class="form-horizontal" action="{% url 'post_process' %}" method="POST" enctype="multipart/form-data"> {% csrf_token %}
+                        <div class="form-group">
+                            <label class="col-sm-2" for="title">Title</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="title" class="form-control" id="title" maxlength="50" value="{{ item.title }}" autofocus>
+                            </div>
                         </div>
-                    </div>
-                </div>
 
-                <div class="form-group">
-                    <label class="col-sm-2" for="category">Category</label>
-                    <div class="col-sm-4">
-                        <select class="form-control" name="category">
-                            {% if item %}
-                            <option value="{{ item.category.eng_name }}">{{ item.category.kor_name }}</option>
-                            {% else %}
-                            <option>--CATEGORY--</option>
-                            {% endif %}
-                            {% for category in categories %}
-                            <option value="{{ category.eng_name }}">{{ category.kor_name }}</option>
+                        <div class="form-group">
+                            <label class="col-sm-2" for="details">Details</label>
+                            <div class="col-sm-10">
+                                <textarea name="details" rows="5" class="form-control" id="details">{{ item.details }}</textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2" for="price">Price</label>
+                            <div class="col-sm-4">
+                                <div class="input-group">
+                                    <span class="input-group-addon">$</span>
+                                    <input type="number" class="form-control" id="price" name="price" value="{{ item.price }}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2" for="category">Category</label>
+                            <div class="col-sm-4">
+                                <select class="form-control" name="category">
+                                    {% if item %}
+                                    <option value="{{ item.category.eng_name }}">{{ item.category.kor_name }}</option>
+                                    {% else %}
+                                    <option>--CATEGORY--</option>
+                                    {% endif %}
+                                    {% for category in categories %}
+                                    <option value="{{ category.eng_name }}">{{ category.kor_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2" for="city">City</label>
+                            <div class="col-sm-4">
+                                <select class="form-control" name="city">
+                                    {% if item %}
+                                    <option value="{{ item.city.slug }}">{{ item.city }}</option>
+                                    {% else %}
+                                    <option value="{{ user.customer.zipcode.city.slug }}">{{ user.customer.zipcode.city }}</option>
+                                    {% endif %}
+                                    {% for city in cities %}
+                                    <option value="{{ city.slug }}">{{ city.name }}, {{ city.state }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        {% if not item %}
+                        <div class="form-group">
+                            <label class="col-sm-2" for="image">Images</label>
+                            <div class="col-sm-4">
+                                <input name="image" type="file" multiple>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="row">
+                            {% for image in item.itemimage_set.all %}
+                            <div class="col-md-4">
+                                <img class="img-responsive" src="{{ HTTP_HOST }}/img/thumbs/{{ image }}">
+                            </div>
                             {% endfor %}
-                        </select>
-                    </div>
+                        </div>
+                        <br>
+                        {% endif %}
+
+                        {% if item %}
+                        <input type="hidden" name="item_code" value="{{ item.url_code }}" >
+                        <input type="hidden" name="edit" value="True">
+                        {% else %}
+                        <input type="hidden" name="create" value="True">
+                        {% endif %}
+
+                        {% if repost %}
+                        <input type="hidden" name="repost" value="True">
+                        {% endif %}
+
+                        <div class="pull-right">
+                            <a class="btn btn-default" href="/" role="button">Cancel</a>
+                            <input type="submit" name="submit" value="{% if item and repost%}Repost{% elif item and not repost %}Edit{% else %}Submit{% endif %}" class="btn btn-primary">
+                        </div>
+
+                    </form>
                 </div>
-
-                <div class="form-group">
-                    <label class="col-sm-2" for="city">City</label>
-                    <div class="col-sm-4">
-                        <select class="form-control" name="city">
-                            {% if item %}
-                            <option value="{{ item.city.slug }}">{{ item.city }}</option>
-                            {% else %}
-                            <option value="{{ user.customer.zipcode.city.slug }}">{{ user.customer.zipcode.city }}</option>
-                            {% endif %}
-                            {% for city in cities %}
-                            <option value="{{ city.slug }}">{{ city.name }}, {{ city.state }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                </div>
-
-                {% if not item %}
-                <div class="form-group">
-                    <label class="col-sm-2" for="image">Images</label>
-                    <div class="col-sm-4">
-                        <input name="image" type="file" multiple>
-                    </div>
-                </div>
-                {% else %}
-                <div class="row">
-                    {% for image in item.itemimage_set.all %}
-                    <div class="col-md-4">
-                        <img class="img-responsive" src="{{ HTTP_HOST }}/img/thumbs/{{ image }}">
-                    </div>
-                    {% endfor %}
-                </div>
-                <br>
-                {% endif %}
-
-                {% if item %}
-                <input type="hidden" name="item_code" value="{{ item.url_code }}" >
-                <input type="hidden" name="edit" value="True">
-                {% else %}
-                <input type="hidden" name="create" value="True">
-                {% endif %}
-
-                {% if repost %}
-                <input type="hidden" name="repost" value="True">
-                {% endif %}
-
-                <div class="pull-right">
-                    <a class="btn btn-default" href="/" role="button">Cancel</a>
-                    <input type="submit" name="submit" value="{% if item and repost%}Repost{% elif item and not repost %}Edit{% else %}Submit{% endif %}" class="btn btn-primary">
-                </div>
-
-            </form>
+            </div>
         </div>
     </div>
 </div>

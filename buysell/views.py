@@ -92,7 +92,44 @@ def log_out(request):
 
 @login_required
 def settings(request):
-    return render(request, 'settings.html')
+    if request.method == 'POST':
+        if request.POST.get('profile'):
+            email = request.POST.get('email')
+            number = request.POST.get('zipcode')
+
+            try:
+                zipcode = Zipcode.objects.get(number=number)
+            except Zipcode.DoesNotExist:
+                return HttpResponse('Your area is not supported')
+            else:
+                user = User.objects.get(username=request.user.username)
+                user.email = email
+                user.customer.zipcode = zipcode
+
+                user.save()
+                user.customer.save()
+
+                return HttpResponse('Successfully updated your profile!')
+        elif request.POST.get('password'):
+            pass_cur = request.POST.get('pass_cur')
+            pass_new = request.POST.get('pass_new')
+            pass_conf = request.POST.get('pass_conf')
+
+            if pass_new == pass_conf:
+                auth = authenticate(username=request.user.username, password=pass_cur)
+                if auth is not None:
+                    user = User.objects.get(username=request.user.username)
+                    user.set_password(pass_new)
+                    user.save()
+                    return HttpResponseRedirect('/join')
+                else:
+                    return HttpResponse('Wrong password')
+            else:
+                return HttpResponse('Password do not match')
+        else:
+            return HttpResponseRedirect('/')
+    else:
+        return render(request, 'settings.html')
 
 @login_required
 def post_create(request):
@@ -270,10 +307,10 @@ def list(request, category=None, page=1):
     else:
         cities = City.objects.all()
 
-    cat = 'all'
+    cat = 'new'
     if not category:
-        return HttpResponseRedirect('/list/all')
-    elif category == 'all':
+        return HttpResponseRedirect('/list/new')
+    elif category == 'new':
         item_list = Item.objects.filter(city__in=cities, is_expired=False, is_removed=False).order_by('-pub_date')
     elif category == 'free':
         item_list = Item.objects.filter(city__in=cities, price='0', is_expired=False, is_removed=False).order_by('-pub_date')

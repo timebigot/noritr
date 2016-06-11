@@ -98,7 +98,7 @@
             {% get_cats as cats %}
             <div class="container navbar-cats">
                 <ul class="nav nav-pills nav-justified">
-                    <li role="presentation"><a href="{% url 'list_cat' category='all' %}">ALL</a></li>
+                    <li role="presentation"><a href="{% url 'list_cat' category='new' %}">NEW</a></li>
                     {% for cat in cats %}
                     <li role="presentation"><a href="{% url 'list_cat' category=cat.slug %}"><div class="text-nowrap">{{ cat.kor_name }}</div></a></li>
                     {% endfor %}
