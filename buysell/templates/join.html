@@ -3,6 +3,7 @@
 <div class="container">
     <div class="row">
         <div class="col-md-6">
+            <h3>Register</h3>
             <form action="{% url 'signup' %}" method="POST">{% csrf_token %}
                 <div class="form-group">
                     <label>Username</label>
@@ -26,6 +27,7 @@
             </form>
         </div>
         <div class="col-md-6">
+            <h3>Login</h3>
             {% if next %}
             <form action="{% url 'login' %}?next={{ next }}" method="POST">{% csrf_token %}
             {% else %}

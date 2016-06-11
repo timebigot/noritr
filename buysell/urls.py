@@ -8,9 +8,15 @@ urlpatterns = [
     url(r'^signup/$', views.sign_up, name='signup'),
     url(r'^login/$', views.log_in, name='login'),
     url(r'^logout/$', views.log_out, name='logout'),
+    url(r'^settings/$', views.settings, name='settings'),
     url(r'^change_zip/$', views.change_zip, name='change_zip'),
-    url(r'^search/$', views.search, name='search'),
+    url(r'^search/$', views.search, name='search_redirect'),
+    url(r'^search/(?P<query>[^\/]+)/$', views.search, name='search'),
+    url(r'^search/(?P<query>[^\/]+)/(?P<page>\d+)/$', views.search, name='search_page'),
     url(r'^post/create/$', views.post_create, name='post_create'),
+    url(r'^post/delete/$', views.post_delete, name='post_delete'),
+    url(r'^post/edit/(?P<url_code>\w+)/$', views.post_edit, name='post_edit'),
+    url(r'^post/repost/(?P<url_code>\w+)/$', views.post_repost, name='post_repost'),
     url(r'^post/process/$', views.post_process, name='post_process'),
     url(r'^post/(?P<url_code>\w{7})/$', views.post, name='post'),
     url(r'^list/(?P<category>[-\w]+)/$', views.list, name='list_cat'),
@@ -18,6 +24,10 @@ urlpatterns = [
     url(r'^message/$', views.message, name='message'),
     url(r'^inbox/$', views.inbox, name='inbox'),
     url(r'^inbox/(?P<url_code>\w+)/$', views.inbox, name='thread'),
+    url(r'^bot/$', views.bot, name='bot'),
+    url(r'^store/manage/$', views.store_manage, name='store_manage'),
+    url(r'^store/(?P<seller>[^\/]+)/$', views.store, name='store'),
+    url(r'^store/(?P<seller>[^\/]+)/(?P<page>\d+)/$', views.store, name='store_page'),
 ]
 
 if settings.DEBUG:

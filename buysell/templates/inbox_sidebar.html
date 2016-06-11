@@ -1,14 +1,15 @@
+{% load tags %}
 <div class="list-group">
     <a href="{% url 'inbox' %}" class="list-group-item">
-        <span class="badge">14</span>
+        <span class="badge">{{ request.user|total_msg }}</span>
         All
     </a>
     <a href="/inbox/unread" class="list-group-item">
-        <span class="badge">4</span>
+        <span class="badge">{{ request.user|unread_msg }}</span>
         Unread
     </a>
     <a href="/inbox/sent" class="list-group-item">
-        <span class="badge">3</span>
+        <span class="badge">{{ request.user|sent_msg }}</span>
         Sent
     </a>
 </div>

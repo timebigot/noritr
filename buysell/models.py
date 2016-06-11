@@ -71,7 +71,7 @@ class Item(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     city = models.ForeignKey(City, on_delete=models.CASCADE)
     pub_date = models.DateTimeField()
-    is_sold = models.BooleanField(default=False)
+    is_expired = models.BooleanField(default=False)
     is_removed = models.BooleanField(default=False)
 
     def __str__(self):
@@ -103,4 +103,4 @@ class Message(models.Model):
     url_code = models.CharField(max_length=9, default='')
 
     def __str__(self):
-        return '%s - %s: %s' % (self.item.url_code, self.sender, self.content)
+        return '%s - %s: %s' % (self.url_code, self.sender, self.content)

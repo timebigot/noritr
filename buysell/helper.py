@@ -8,6 +8,8 @@ from buysell import keys
 from django.conf import settings
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.http import HttpResponse, HttpResponseRedirect
 
 def url_coder(size=7, chars=string.ascii_uppercase + string.ascii_lowercase + string.digits):
     url_code = ''.join(random.choice(chars) for _ in range(size))
@@ -62,3 +64,14 @@ def image_process(images):
                 return HttpResponse('The image is too big')
         else:
             return HttpResponse('Appropriate filetypes are jpg, png, and gif')
+
+def paginator(item_list, page):
+    paginator = Paginator(item_list, 24)
+    try:
+        items = paginator.page(page)
+    except PageNotAnInteger:
+        return 1 
+    except EmptyPage:
+        return 2
+    else:
+        return items

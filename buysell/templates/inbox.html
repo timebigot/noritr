@@ -8,15 +8,19 @@ Inbox
 {% load humanize %}
 
 <div class="container">
+    <h3>Inbox</h3>
+</div>
+<div class="container">
     <div class="row">
         <div class="col-md-3">
             {% include 'inbox_sidebar.html' %}
         </div>
         <div class="col-md-9">
             <ul class="list-group">
-                {% for msg in messages %}
-                {% with msg=msg.url_code|inbox %}
-                <li class="list-group-item{% if not msg.is_read %} list-group-item{% endif %}">
+                {% if messages %}
+                {% for message in messages %}
+                {% with msg=message.url_code|inbox %}
+                <li class="list-group-item{% if msg.url_code|is_read != request.user.username and msg.url_code|is_read != None %} list-group-item-warning{% endif %}">
                     <div class="media">
                         <div class="media-left">
                             <a href="{% url 'thread' msg.url_code %}">
@@ -32,6 +36,9 @@ Inbox
                 </li>
                 {% endwith %}
                 {% endfor %}
+                {% else %}
+                <h4>No messages</h4>
+                {% endif %}
             </ul>
         </div>
     </div>

@@ -1,3 +1,4 @@
+{% load tags %}
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -18,7 +19,7 @@
 
     <body>
         <header class="hidden-sm hidden-xs">
-            <div class="container-fluid navbar-main">
+            <div class="container navbar-main">
                 <div class="row">
                     <div class="col-xs-3">
                         <div class="row">
@@ -58,9 +59,9 @@
                         </div>
                     </div><!--col-xs-3-->
                     <div class="col-xs-6">
-                        <form action="{% url 'search' %}" method="GET" class="search">
+                        <form action="{% url 'search_redirect' %}" method="POST" class="search">{% csrf_token %}
                             <div class="input-group">
-                                <input type="text" class="form-control" placeholder="SEARCH" name="q">
+                                <input type="text" class="form-control" placeholder="SEARCH" name="query">
                                 <span class="input-group-btn">
                                     <button class="btn btn-default" type="submit"><i class="fa fa-search" aria-hidden="true"></i> </button>
                                 </span>
@@ -73,12 +74,12 @@
                                 {% if user.is_authenticated %}
                                 <li role="presentation" class="dropdown">
                                     <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                                        {{ user.username }} <span class="caret"></span>
+                                        {{ user.username }} {% if user|unread_msg %} <span class="badge">{{ user|unread_msg }}</span> {% endif %}<span class="caret"></span>
                                     </a>
                                     <ul class="dropdown-menu dropdown-menu-right">
-                                        <li><a href="{% url 'inbox' %}"><i class="fa fa-envelope-o" aria-hidden="true"></i> MESSAGES</a></li>
-                                        <li><a href=""><i class="fa fa-shopping-basket" aria-hidden="true"></i> MY STORE</a></li>
-                                        <li><a href=""><i class="fa fa-cog" aria-hidden="true"></i> SETTINGS</a></li>
+                                        <li><a href="{% url 'inbox' %}"><i class="fa fa-envelope-o" aria-hidden="true"></i> MESSAGES {% if user|unread_msg %} <span class="badge">{{ user|unread_msg }}</span> {% endif %}</a></li>
+                                        <li><a href="{% url 'store_manage' %}"><i class="fa fa-shopping-basket" aria-hidden="true"></i> MY STORE</a></li>
+                                        <li><a href="{% url 'settings' %}"><i class="fa fa-cog" aria-hidden="true"></i> SETTINGS</a></li>
                                         <li role="separator" class="divider"></li>
                                         <li><a href="{% url 'logout' %}"><i class="fa fa-power-off" aria-hidden="true"></i> LOGOUT</a></li>
                                     </ul>
@@ -95,11 +96,11 @@
             <hr class="navbar-border">
             {% load tags %}
             {% get_cats as cats %}
-            <div class="container-fluid navbar-cats">
+            <div class="container navbar-cats">
                 <ul class="nav nav-pills nav-justified">
                     <li role="presentation"><a href="{% url 'list_cat' category='all' %}">ALL</a></li>
                     {% for cat in cats %}
-                    <li role="presentation"><a href="{% url 'list_cat' category=cat.slug %}">{{ cat.kor_name }}</a></li>
+                    <li role="presentation"><a href="{% url 'list_cat' category=cat.slug %}"><div class="text-nowrap">{{ cat.kor_name }}</div></a></li>
                     {% endfor %}
                     <li role="presentation"><a href="{% url 'list_cat' category='free' %}">FREE</a></li>
                 </ul>
@@ -109,7 +110,7 @@
         {% endblock %}
         <footer>
             <hr>
-            <div class="container-fluid">
+            <div class="container">
                 <p align="center">&copy; {% now "Y"%}, Noritr.com</p>
             </div>
         </footer>

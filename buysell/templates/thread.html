@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block title %}
-
+Message: {{ recipient }}
 {% endblock %}
 {% block content %}
 {% load humanize %}
@@ -14,7 +14,7 @@
         <div class="col-md-9">
             <ul class="list-group">
                 {% for msg in messages %}
-                <li class="list-group-item">
+                <li class="list-group-item{% if not msg.is_read %} list-group-item-warning{% endif %}">
                     <div class="media">
                         <div class="media-body">
                             <div class="row">
@@ -36,7 +36,7 @@
                         <textarea class="form-control" rows="7" name="message"></textarea>
                         <br>
                         <div>
-                            <input type="hidden" name="recipient" value="{{ sender }}">
+                            <input type="hidden" name="recipient" value="{{ recipient }}">
                             <input type="hidden" name="item" value="{{ item_url }}">
                             <input type="hidden" name="url_code" value="{{ url_code }}">
                             <input class="btn btn-primary pull-right" name="submit" type="submit" value="Send">

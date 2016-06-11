@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block title %}
-{% if category %}
-{{ category|title }}
+{% if title %}
+{{ title|title }}
 {% else %}
 {{ search }}
 {% endif %}
@@ -10,6 +10,17 @@
 {% block content %}
 {% load staticfiles %}
 {% load tags %}
+<div class="container">
+    {% if title.kor_name %}
+    <h3>{{ title.kor_name }}</h3>
+    {% elif title == 'all' or title == 'free' %}
+    <h3>{{ title|title }}</h3>
+    {% elif title %}
+    <h3>{{ title }}</h3>
+    {% elif search %}
+    <h3>Search: {{ search }}</h3>
+    {% endif %}
+</div>
 <div class="container">
     <div class="row">
         {% for item in items %}
@@ -21,7 +32,15 @@
     <ul class="pagination pagination-lg">
         {% if items.has_previous %}
         <li>
-            <a href="/list/{{ category|lower }}/{{ items.previous_page_number }}">
+            {% if title.slug %}
+            <a href="/{{ view }}/{{ title.slug|lower }}/{{ items.previous_page_number }}">
+            {% elif seller %}
+            <a href="/{{ view }}/{{ seller }}/{{ items.previous_page_number }}">
+            {% elif search %}
+            <a href="/{{ view }}/{{ search }}/{{ items.previous_page_number }}">
+            {% else %}
+            <a href="/{{ view }}/{{ title|lower }}/{{ items.previous_page_number }}">
+            {% endif %}
                 <span aria-hidden="true">&laquo;</span>
             </a>
         </li>
@@ -45,7 +64,15 @@
 
         {% if items.has_next %}
         <li>
-            <a href="/list/{{ category }}/{{ items.next_page_number }}">
+            {% if title.slug %}
+            <a href="/{{ view }}/{{ title.slug|lower }}/{{ items.next_page_number }}">
+            {% elif seller %}
+            <a href="/{{ view }}/{{ seller }}/{{ items.next_page_number }}">
+            {% elif search %}
+            <a href="/{{ view }}/{{ search }}/{{ items.next_page_number }}">
+            {% else %}
+            <a href="/{{ view }}/{{ title|lower }}/{{ items.next_page_number }}">
+            {% endif %}
                 <span aria-hidden="true">&raquo;</span>
             </a>
         </li>

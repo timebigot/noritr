@@ -26,3 +26,26 @@ def new_item(pub_date):
 def inbox(url_code):
     msg = Message.objects.filter(url_code=url_code).latest('pub_date')
     return msg
+
+@register.filter
+def is_read(url_code):
+    try:
+        is_read = Message.objects.filter(url_code=url_code, is_read=False).last().sender.username
+    except:
+        is_read = None
+    return is_read
+
+@register.filter
+def total_msg(user):
+    total = Message.objects.filter(recipient=user).all().count()
+    return total
+
+@register.filter
+def unread_msg(user):
+    unread = Message.objects.filter(recipient=user, is_read=False).all().count()
+    return unread
+
+@register.filter
+def sent_msg(user):
+    sent = Message.objects.filter(sender=user).count()
+    return sent

@@ -62,3 +62,8 @@ header {
 .compose-box {
     padding-bottom: 50px;
 }
+
+/*store_manage*/
+.img-manage {
+    height: 100px;
+}
