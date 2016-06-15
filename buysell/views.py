@@ -28,7 +28,7 @@ def index(request):
 
     one_day = datetime.now() - timedelta(hours=24)
     items_new = Item.objects.filter(city__in=cities, is_expired=False, is_removed=False).order_by('-pub_date')[:12]
-    items_rand = Item.objects.filter(city__in=cities, pub_date__lte=one_day).order_by('?')[:12]
+    items_rand = Item.objects.filter(city__in=cities, pub_date__lte=one_day).order_by('?')[:6]
 
     return render(request, 'index.html', {'items_new': items_new, 'items_rand': items_rand})
 
@@ -171,7 +171,7 @@ def post_repost(request, url_code):
         return render(request, 'post_create.html', {'categories': categories, 'cities': cities, 'item': item, 'repost': repost})
 
 @login_required
-def post_delete(request):
+def post_remove(request):
     if request.method == 'POST':
         item_code = request.POST.get('item_code')
         item = Item.objects.get(url_code=item_code)
@@ -258,10 +258,10 @@ def post_process(request):
 
                                 if W > H:
                                     thumb = thumb.crop((W-H, H-H, W+H, H+H))
-                                    thumb = thumb.resize((244,244))
+                                    thumb = thumb.resize((350,350))
                                 elif W < H:
                                     thumb = thumb.crop((W-W, H-W, W+W, H+W))
-                                    thumb = thumb.resize((244,244))
+                                    thumb = thumb.resize((300,300))
 
                                 thumb.save(filepath)
 
@@ -363,7 +363,7 @@ def search(request, query='', page=1):
 
         items = paginator(item_list, page)
         if not items:
-            return HttpResponse(items)
+            return HttpResponse('No results')
         else:
             return render(request, 'list.html', {'items': items, 'search': title, 'view': 'search'})
 

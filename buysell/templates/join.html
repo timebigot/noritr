@@ -1,11 +1,32 @@
 {% extends 'base.html' %}
 {% block title %} Join {% endblock %}
-
 {% block content %}
 <div class="container">
     <div class="row">
         <div class="col-md-6">
-            <h3>Register</h3>
+            <h3>Login</h3>
+            {% if next %}
+            <form action="{% url 'login' %}?next={{ next }}" method="POST">{% csrf_token %}
+            {% else %}
+            <form action="{% url 'login' %}" method="POST">{% csrf_token %}
+            {% endif %}
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" name="username" class="form-control" id="focus-login" autofocus>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" name="password" class="form-control">
+                </div>
+                <a class="pull-right" href=""><p>Reset Password</p></a>
+                <br>
+                <div class="form-group">
+                    <input type="submit" name="submit" value="LOGIN" class="btn btn-success">
+                </div>
+            </form>
+        </div>
+        <div class="col-md-6">
+            <h3>Signup</h3>
             <form action="{% url 'signup' %}" method="POST">{% csrf_token %}
                 <div class="form-group">
                     <label>Username</label>
@@ -24,27 +45,7 @@
                     <input type="number" name="zipcode" class="form-control" id="focus-signup">
                 </div>
                 <div class="form-group">
-                    <input type="submit" name="submit" value="REGISTER" class="btn btn-success">
-                </div>
-            </form>
-        </div>
-        <div class="col-md-6">
-            <h3>Login</h3>
-            {% if next %}
-            <form action="{% url 'login' %}?next={{ next }}" method="POST">{% csrf_token %}
-            {% else %}
-            <form action="{% url 'login' %}" method="POST">{% csrf_token %}
-            {% endif %}
-                <div class="form-group">
-                    <label>Username</label>
-                    <input type="text" name="username" class="form-control" id="focus-login">
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" name="password" class="form-control">
-                </div>
-                <div class="form-group">
-                    <input type="submit" name="submit" value="LOGIN" class="btn btn-success">
+                    <input type="submit" name="submit" value="SIGNUP" class="btn btn-success">
                 </div>
             </form>
         </div>

@@ -1,3 +1,6 @@
+body {
+    font-family: 'Roboto', sans-serif;
+}
 a {
     color: black;
 }
@@ -9,7 +12,7 @@ a:focus, a:hover {
 }
 
 /* header */
-header {
+.navbar-lg {
     margin-bottom: 20px;
 }
 
@@ -24,21 +27,51 @@ header {
 .search {
     margin-top: 3px;
 }
+.nav .open>a:hover, .nav .open>a:focus {
+    background-color: transparent;
+}
 .btn-post {
     margin-top: 2px;
 }
 .navbar-border {
     margin: 0px;
 }
+#buttonUser {
+    text-decoration: none;
+}
+#buttonUser>h4 {
+    cursor: pointer;
+}
+#buttonSearch>h4 {
+    cursor: pointer;
+}
+.badge-red {
+    background-color: #c9302c;
+}
 
 /* navbar-cat */
-.navbar-cats {
+.navcat {
     padding: 0px;
+}
+.nav>li>a:hover, .nav>li>a:focus {
+    text-decoration: underline;
+    background-color: transparent;
+}
+.nav>li>.navcat-new {
+    padding-left: 0px;
+}
+.nav>li>.navcat-free {
+    padding-right: 0px;
+}
+
+/* jumbotron */
+.jumbotron {
+    background-color: #333;
+    color: white;
 }
 
 /* cards */
 .card {
-    padding: 5px;
 }
 .thumbnail {
     padding: 1px;
@@ -59,6 +92,11 @@ header {
 .pagination>.page-number>a, .pagination>.page-number>a:hover {
     background-color: transparent;
     color: #777;
+}
+
+/*post*/
+a.list-group-item {
+    color: #333;
 }
 
 /*inbox*/

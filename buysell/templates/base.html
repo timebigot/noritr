@@ -12,13 +12,14 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-        <link  href="http://cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.css" rel="stylesheet">
+        <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Roboto' type='text/css'>
+        <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.css">
         <link rel="stylesheet" href="{% static 'css/base.css' %}">
         {% block index_style %}{% endblock %}
     </head>
 
     <body>
-        <header class="hidden-sm hidden-xs">
+        <header class="navbar-lg hidden-sm hidden-xs">
             <div class="container navbar-main">
                 <div class="row">
                     <div class="col-xs-3">
@@ -35,26 +36,6 @@
                                 {% else %}
                                 <a href="{% url 'join' %}"><i class="fa fa-map-marker" aria-hidden="true"></i> Everywhere </a>
                                 {% endif %}
-                                <div class="modal fade" tabindex="-1" role="dialog" id="changeZip">
-                                    <div class="modal-dialog modal-sm">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                                <h4 class="modal-title">Change location</h4>
-                                            </div>
-                                            <div class="modal-body">
-                                                <form action="{% url 'change_zip' %}" method="POST">{% csrf_token %}
-                                                    <div class="input-group">
-                                                        <input type="number" class="form-control" placeholder="Enter a valid zipcode" name="zipcode" min="1000" max="99999">
-                                                        <span class="input-group-btn">
-                                                            <button class="btn btn-primary" type="submit">Update</button>
-                                                        </span>
-                                                    </div><!-- /input-group -->
-                                                </form>
-                                            </div><!-- /.modal-body -->
-                                        </div><!-- /.modal-content -->
-                                    </div><!-- /.modal-dialog -->
-                                </div><!-- /.modal -->
                             </div>
                         </div>
                     </div><!--col-xs-3-->
@@ -73,12 +54,13 @@
                             <ul class="nav nav-pills">
                                 {% if user.is_authenticated %}
                                 <li role="presentation" class="dropdown">
-                                    <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                                        {{ user.username }} {% if user|unread_msg %} <span class="badge">{{ user|unread_msg }}</span> {% endif %}<span class="caret"></span>
+                                    <a class="dropdown-toggle" data-toggle="dropdown" href="" role="button" aria-haspopup="true" aria-expanded="false">
+                                        {{ user.username }} {% if user|unread_msg %} <span class="badge badge-red">{{ user|unread_msg }}</span> {% endif %}<span class="caret"></span>
                                     </a>
                                     <ul class="dropdown-menu dropdown-menu-right">
-                                        <li><a href="{% url 'inbox' %}"><i class="fa fa-envelope-o" aria-hidden="true"></i> MESSAGES {% if user|unread_msg %} <span class="badge">{{ user|unread_msg }}</span> {% endif %}</a></li>
+                                        <li><a href="{% url 'inbox' %}"><i class="fa fa-envelope-o" aria-hidden="true"></i> MESSAGES {% if user|unread_msg %} <span class="badge badge-red">{{ user|unread_msg }}</span> {% endif %}</a></li>
                                         <li><a href="{% url 'store_manage' %}"><i class="fa fa-shopping-basket" aria-hidden="true"></i> MY STORE</a></li>
+                                        <li><a href=""><i class="fa fa-thumb-tack" aria-hidden="true"></i> SAVED</a></li>
                                         <li><a href="{% url 'settings' %}"><i class="fa fa-cog" aria-hidden="true"></i> SETTINGS</a></li>
                                         <li role="separator" class="divider"></li>
                                         <li><a href="{% url 'logout' %}"><i class="fa fa-power-off" aria-hidden="true"></i> LOGOUT</a></li>
@@ -94,20 +76,148 @@
                 </div><!--row-->
             </div><!--container-->
             <hr class="navbar-border">
-            {% load tags %}
             {% get_cats as cats %}
-            <div class="container navbar-cats">
+            <div class="container navcat">
                 <ul class="nav nav-pills nav-justified">
-                    <li role="presentation"><a href="{% url 'list_cat' category='new' %}">NEW</a></li>
+                    <li role="presentation"><a class="navcat-new" href="{% url 'list_cat' category='new' %}">NEW</a></li>
                     {% for cat in cats %}
                     <li role="presentation"><a href="{% url 'list_cat' category=cat.slug %}"><div class="text-nowrap">{{ cat.kor_name }}</div></a></li>
                     {% endfor %}
-                    <li role="presentation"><a href="{% url 'list_cat' category='free' %}">FREE</a></li>
+                    <li role="presentation"><a class="navcat-free" href="{% url 'list_cat' category='free' %}">FREE</a></li>
                 </ul>
             </div>
         </header>
+        <header class="navbar-xs hidden-lg hidden-md">
+            <div class="container navbar-main">
+                <div class="row">
+                    <div class="col-xs-5">
+                        <div class="pull-left">
+                            <a id="buttonSearch">
+                                <h4>
+                                    <i class="fa fa-search" aria-hidden="true"></i>
+                                </h4>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-xs-2">
+                        <div align="center">
+                            <a href="/">
+                                <h4><b>4989</b></h4>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-xs-5">
+                        <div class="pull-right">
+                            <a id="buttonUser">
+                                <h4><i class="fa fa-user" aria-hidden="true"></i>
+                                    {% if user.is_authenticated %}
+                                    {% if user|unread_msg %}<span class="badge badge-red">{{ user|unread_msg }}</span> {% endif %}
+                                    {% endif %}
+                                </h4>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr class="navbar-border">
+        </header>
+
+        <main class="hidden-xs hidden-sm hidden-md hidden-lg" id="mainSearch">
+        <div class="container" align="center">
+            <br>
+            <form action="{% url 'search_redirect' %}" method="POST" class="search">{% csrf_token %}
+                <div class="input-group input-group-lg">
+                    <input type="text" class="form-control" placeholder="SEARCH" name="query">
+                    <span class="input-group-btn">
+                        <button class="btn btn-default" type="submit"><i class="fa fa-search" aria-hidden="true"></i> </button>
+                    </span>
+                </div><!-- /input-group -->
+                {% if user.customer.zipcode.city %}
+                <a href="" data-toggle="modal" data-target="#changeZip">
+                    <i class="fa fa-map-marker" aria-hidden="true"></i> 
+                    {{ user.customer.zipcode.city }}
+                </a>
+                {% else %}
+                <a href="{% url 'join' %}"><i class="fa fa-map-marker" aria-hidden="true"></i> Everywhere </a>
+                {% endif %}
+            </form>
+            <br>
+            <div class="list-group">
+                <a href="/" class="list-group-item list-group-item-info">HOME</a>
+                <br>
+                <a href="{% url 'list_cat' category='new' %}" class="list-group-item">NEW</a>
+                {% get_cats as cats %}
+                {% for cat in cats %}
+                <a href="{% url 'list_cat' category=cat.slug%}" class="list-group-item">{{ cat.kor_name }}</a>
+                {% endfor %}
+                <a href="{% url 'list_cat' category='free' %}" class="list-group-item">FREE</a>
+            </div>
+        </div>
+        </main>
+
+        <main class="hidden-xs hidden-sm hidden-md hidden-lg" id="mainUser">
+        <div class="container">
+            <br>
+            <a href="{% url 'post_create' %}" class="btn btn-primary btn-lg btn-block btn-post" role="button">POST AN ITEM</a>
+            <br>
+            {% if not user.is_authenticated %}
+            <a href="{% url 'join' %}" class="btn btn-default btn-lg btn-block btn-post" role="button">LOGIN/SIGNUP</a>
+            {% else %}
+            <div class="list-group">
+                <li class="list-group-item">
+                    <i class="fa fa-user" aria-hidden="true"></i>
+                    <b>{{ request.user }}</b>
+                </li>
+                <a href="{% url 'inbox' %}" class="list-group-item">
+                    <i class="fa fa-envelope-o" aria-hidden="true"></i> MESSAGES
+                    {% if user.is_authenticated %}
+                    {% if user|unread_msg %} <span class="badge badge-red">{{ user|unread_msg }}</span> {% endif %}
+                    {% endif %}
+                </a>
+                <a href="{% url 'store_manage' %}" class="list-group-item">
+                    <i class="fa fa-shopping-basket" aria-hidden="true"></i> MANAGE STORE
+                </a>
+                <a href="{% url 'settings' %}" class="list-group-item">
+                    <i class="fa fa-cog" aria-hidden="true"></i> SETTINGS
+                </a>
+                <br>
+                <a href="{% url 'logout' %}" class="list-group-item">
+                    <i class="fa fa-power-off" aria-hidden="true"></i> LOGOUT
+                </a>
+            </div>
+            {% endif %}
+        </div>
+        </main>
+        {% if user.is_authenticated %}
+        <section>
+            <div class="modal fade" tabindex="-1" role="dialog" id="changeZip">
+                <div class="modal-dialog modal-sm">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">Change location</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form action="{% url 'change_zip' %}" method="POST">{% csrf_token %}
+                                <div class="input-group">
+                                    <input type="number" class="form-control" placeholder="Enter a valid zipcode" name="zipcode" min="1000" max="99999">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-primary" type="submit">Update</button>
+                                    </span>
+                                </div><!-- /input-group -->
+                            </form>
+                        </div><!-- /.modal-body -->
+                    </div><!-- /.modal-content -->
+                </div><!-- /.modal-dialog -->
+            </div><!-- /.modal -->
+        </section>
+        {% endif %}
+
+        <main class="visible-xs visible-sm visible-md visible-lg" id="mainContent">
         {% block content %}
         {% endblock %}
+        </main>
+
         <footer>
             <hr>
             <div class="container">

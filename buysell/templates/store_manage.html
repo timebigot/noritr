@@ -5,7 +5,7 @@ Manage
 
 {% block content %}
 <div class="container">
-    <h3>Store Management<small><a class="btn btn-default pull-right" href="{% url 'store' request.user %}" role="button">Store Front</a></small>
+    <h3>Manage<small><a class="btn btn-default pull-right" href="{% url 'store' request.user %}" role="button">Store Front</a></small>
 </div>
 <div class="container table-responsive">
     <table class="table table-striped">
@@ -30,7 +30,7 @@ Manage
             {% endif %}
                 <th>
                         {% if item.is_removed %}
-                        Deleted
+                        Removed
                         {% elif item.is_expired %}
                         Expired
                         {% else %}
@@ -52,8 +52,8 @@ Manage
                                 edit
                             </a>
                             | 
-                            <a href="" data-toggle="modal" data-target="#deleteItem" data-title="{{ item.title }}" data-code="{{ item.url_code }}">
-                                delete
+                            <a href="" data-toggle="modal" data-target="#removeItem" data-title="{{ item.title }}" data-code="{{ item.url_code }}">
+                                remove
                             </a>
                         </div>
                     </th>
@@ -61,21 +61,21 @@ Manage
                 </tr>
                 {% endfor %}
 
-                <div class="modal fade" id="deleteItem" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                <div class="modal fade" id="removeItem" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
                     <div class="modal-dialog modal-sm" role="document">
                         <div class="modal-content">
                             <div class="modal-header">
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                <h4 class="modal-title" id="myModalLabel">Confirm Deletion</h4>
+                                <h4 class="modal-title" id="myModalLabel">Confirm Removal</h4>
                             </div>
                             <div class="modal-body">
-                                Are you sure you want to delete this item?
+                                Are you sure you want to remove this item?
                             </div>
                             <div class="modal-footer">
-                                <form method="POST" action="{% url 'post_delete' %}"> {% csrf_token %}
+                                <form method="POST" action="{% url 'post_remove' %}"> {% csrf_token %}
                                     <input type=hidden value="code" name="item_code">
                                     <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
-                                    <input type="submit" class="btn btn-danger" value="Yes, delete this item" name="submit">
+                                    <input type="submit" class="btn btn-danger" value="Yes, remove this item" name="submit">
                                 </form>
                             </div>
                         </div>

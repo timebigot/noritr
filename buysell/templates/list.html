@@ -1,7 +1,11 @@
 {% extends 'base.html' %}
 {% block title %}
-{% if title %}
+{% if title.kor_name %}
+{{ title.kor_name }}
+{% elif title == 'new' or title == 'free' %}
 {{ title|title }}
+{% elif title %}
+{{ title }}
 {% else %}
 {{ search }}
 {% endif %}
@@ -10,16 +14,22 @@
 {% block content %}
 {% load staticfiles %}
 {% load tags %}
-<div class="container">
-    {% if title.kor_name %}
-    <h3>{{ title.kor_name }}</h3>
-    {% elif title == 'new' or title == 'free' %}
-    <h3>{{ title|title }}</h3>
-    {% elif title %}
-    <h3>{{ title }}</h3>
-    {% elif search %}
-    <h3>Search: {{ search }}</h3>
-    {% endif %}
+<div class="jumbotron">
+    <div class="container">
+        <div align="center">
+            <h2>
+            {% if title.kor_name %}
+            {{ title.kor_name }}
+            {% elif title == 'new' or title == 'free' %}
+            {{ title|title }}
+            {% elif title %}
+            {{ title }}
+            {% elif search %}
+            Search: {{ search }}
+            {% endif %}
+            </h2>
+        </div>
+    </div>
 </div>
 <div class="container">
     <div class="row">

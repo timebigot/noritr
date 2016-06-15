@@ -18,10 +18,10 @@
     <div class="row">
         <div class="col-md-8" align="center">
             <br>
-            <div class="fotorama" data-nav="thumbs" data-fit="contain">
+            <div class="fotorama" data-nav="thumbs" data-fit="contain" data-allowfullscreen="true">
                 {% if item.itemimage_set.all %}
                 {% for image in item.itemimage_set.all %}
-                <img src="/img/{{ image }}" class="img-responsive" alt="{{ item.title }}">
+                <a href="/img/{{ image }}" alt="{{ item.title }}"><img src="/img/thumbs/{{ image }}"></a>
                 {% endfor %}
                 {% else %}
                 <img src="{% static 'img/test.jpg' %}" class="img-responsive" alt="{{ item.title }}">
@@ -48,7 +48,7 @@
                             </div>
                             <div class="modal-body">
                                 <div class="form-group">
-                                    <textarea class="form-control" rows="5" placeholder="Request to buy or ask a question..." name="message"></textarea>
+                                    <textarea class="form-control" rows="5" placeholder="Request to buy or ask a question..." name="message" id="focus-contact"></textarea>
                                     <input type="hidden" name="recipient" value="{{ item.user }}">
                                     <input type="hidden" name="item" value="{{ item.url_code }}">
                                 </div>
@@ -77,17 +77,17 @@
                 </li>
             </ul>
             <ul class="list-group">
-                <li class="list-group-item">
+                <a class="list-group-item" href="{% url 'store' item.user %}">
                     <strong>Seller:</strong>
-                    <p class="pull-right"><a href="{% url 'store' item.user %}">{{ item.user }}</a></p>
-                </li> 
-                <li class="list-group-item">
+                    <p class="pull-right">{{ item.user }}</p>
+                </a>
+                <a class="list-group-item" href="{% url 'list_cat' item.category.slug %}">
+                    <strong>Category:</strong>
+                    <p class="pull-right">{{ item.category.kor_name }}</p>
+                </a> 
+               <li class="list-group-item">
                     <strong>Location:</strong>
                     <p class="pull-right">{{ item.city }}</p>
-                </li> 
-                <li class="list-group-item">
-                    <strong>Category:</strong>
-                    <p class="pull-right"><a href="{% url 'list_cat' item.category.slug %}">{{ item.category.kor_name }}</a></p>
                 </li> 
             </ul>
         </div>
@@ -95,7 +95,7 @@
 </div>
 {% if more_items %}
 <div class="container">
-    <h3>More from {{ item.user }} 
+    <h3>More From Seller
         <small>
             <a class="btn btn-default pull-right" href="{% url 'store' item.user %}" role="button">
                 See more
