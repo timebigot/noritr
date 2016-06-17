@@ -2,7 +2,7 @@
 {% block title %}
 {% if title.kor_name %}
 {{ title.kor_name }}
-{% elif title == 'new' or title == 'free' %}
+{% elif title == 'new' or title == 'free' or title == 'history' or title == 'favorites' %}
 {{ title|title }}
 {% elif title %}
 {{ title }}
@@ -20,7 +20,7 @@
             <h2>
             {% if title.kor_name %}
             {{ title.kor_name }}
-            {% elif title == 'new' or title == 'free' %}
+            {% elif title == 'new' or title == 'free' or title == 'history' or title == 'favorites' %}
             {{ title|title }}
             {% elif title %}
             {{ title }}
@@ -49,6 +49,8 @@
             <a href="/{{ view }}/{{ seller }}/{{ items.previous_page_number }}">
             {% elif search %}
             <a href="/{{ view }}/{{ search }}/{{ items.previous_page_number }}">
+            {% elif title == 'history' or title == 'favorites' %}
+            <a href="/{{ title }}/{{ items.previous_page_number }}">
             {% else %}
             <a href="/{{ view }}/{{ title|lower }}/{{ items.previous_page_number }}">
             {% endif %}
@@ -81,6 +83,8 @@
             <a href="/{{ view }}/{{ seller }}/{{ items.next_page_number }}">
             {% elif search %}
             <a href="/{{ view }}/{{ search }}/{{ items.next_page_number }}">
+            {% elif title == 'history' or title == 'favorites' %}
+            <a href="/{{ title }}/{{ items.next_page_number }}">
             {% else %}
             <a href="/{{ view }}/{{ title|lower }}/{{ items.next_page_number }}">
             {% endif %}

@@ -17,8 +17,8 @@ Inbox
         </div>
         <div class="col-md-9">
             <ul class="list-group">
-                {% if messages %}
-                {% for message in messages %}
+                {% if msgs %}
+                {% for message in msgs %}
                 {% with msg=message.url_code|inbox %}
                 <li class="list-group-item{% if msg.url_code|is_read != request.user.username and msg.url_code|is_read != None %} list-group-item-warning{% endif %}">
                     <div class="media">
@@ -28,7 +28,9 @@ Inbox
                             </a>
                         </div>
                         <div class="media-body">
-                            <a href="{% url 'thread' msg.url_code %}"><b class="media-heading">{{ msg.item.title }}</b></a>
+                            <a href="{% url 'thread' msg.url_code %}">
+                                <h4 href="{% url 'thread' msg.url_code %}">{{ msg.item.title }}</h4>
+                            </a>
                             <p>{{ msg.sender }} - {{ msg.pub_date|naturaltime }}</p>
                             <p>{{ msg.content }}</p>
                         </div>

@@ -7,7 +7,11 @@
 <div class="jumbotron">
     <div class="container">
         <div align="center">
+            {% if user.is_authenticated %}
+            <h2>Welcome, {{ user }}!</h2>
+            {% else %}
             <h2>Welcome to 4989</h2>
+            {% endif %}
         </div>
     </div>
 </div>

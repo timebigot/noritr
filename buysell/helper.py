@@ -5,7 +5,7 @@ import os
 from urllib.request import urlopen
 from buysell.models import Item, ItemImage
 from buysell import keys
-from django.conf import settings
+from django.conf import settings as base_set
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
@@ -21,7 +21,7 @@ def url_coder(size=7, chars=string.ascii_uppercase + string.ascii_lowercase + st
         else:
             continue
 
-def ip_finder(ip=keys.IP_KEY):
+def ip_finder(ip=base_set.IPDB_KEY):
     url = 'http://api.ipinfodb.com/v3/ip-city/?key=' + keys.IP_KEY + '&format=json&ip=' + ip
     res = urlopen(url).read().decode('utf-8')
     obj = json.loads(res)

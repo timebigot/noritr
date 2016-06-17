@@ -5,10 +5,10 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
-from django.conf import settings
+from django.conf import settings as base_set
 from django.db.models import Q
 from django.utils import timezone
-from buysell.models import Category, Item, ItemImage, Area, City, State, Zipcode, Customer, PostView, Message
+from buysell.models import *
 from buysell.helper import url_coder, image_process, paginator
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
@@ -16,8 +16,10 @@ from PIL import Image
 from datetime import datetime, timedelta
 from django.db.models import Count, Max
 from parser import missy_parser
+from django.contrib import messages
 
 def index(request):
+    print(base_set.MEDIA_ROOT)
     if request.user.is_authenticated():
         zipcode = request.user.customer.zipcode.number
         area = Zipcode.objects.get(number=zipcode).city.state.area.slug
@@ -34,7 +36,7 @@ def index(request):
 
 def join(request):
     if request.user.is_authenticated():
-        return HttpResponseRedirect('/')
+        return redirect('/')
     else:
         if request.method == 'GET':
             next = request.GET.get('next')
@@ -46,19 +48,26 @@ def sign_up(request):
         email = request.POST.get('email')
         password = request.POST.get('password')
         zipcode = request.POST.get('zipcode')
-        zipcode = Zipcode.objects.get(number=zipcode)
 
         if User.objects.filter(username=username).exists():
-            return HttpResponse('username taken')
-        elif User.objects.filter(email=email).exists():
-            return HttpResponse('email in use')
-        else:
+            messages.error(request, 'Username is taken')
+
+        if User.objects.filter(email=email).exists():
+            messages.error(request, 'Email in use')
+
+        try:
+            zipcode = Zipcode.objects.get(number=zipcode)
+        except:
+            messages.error(request, 'Area not supported')
+
+        if not messages:
             user = User.objects.create_user(username, email, password)
             add = Customer(user=user, zipcode=zipcode)
             add.save()
-            return HttpResponse('account created')
+            messages.success(request, 'Account created!')
+        return render(request, 'join.html')
     else:
-        return HttpResponseRedirect('/')
+        return redirect('/')
 
 def log_in(request):
     next = request.GET.get('next')
@@ -74,21 +83,22 @@ def log_in(request):
                 login(request, user)
                 request.session['zip'] = request.user.customer.zipcode.number
                 if not next:
-                    return HttpResponseRedirect('/')
+                    return redirect('/')
                 else:
-                    return HttpResponseRedirect(next)
+                    return redirect(next)
             else:
                 return HttpResponse('activate your account')
         else:
-            return HttpResponse('wrong username/password')
+            messages.error(request, 'Wrong username/password')
+            return redirect('/join')
     else:
         # not a POST method
-        return HttpResponseRedirect('/')
+        return redirect('/')
 
 @login_required
 def log_out(request):
     logout(request)
-    return HttpResponseRedirect('/')
+    return redirect('/')
 
 @login_required
 def settings(request):
@@ -109,7 +119,8 @@ def settings(request):
                 user.save()
                 user.customer.save()
 
-                return HttpResponse('Successfully updated your profile!')
+                messages.success(request, 'Successfully updated your profile!')
+                return render(request, 'settings.html')
         elif request.POST.get('password'):
             pass_cur = request.POST.get('pass_cur')
             pass_new = request.POST.get('pass_new')
@@ -121,13 +132,15 @@ def settings(request):
                     user = User.objects.get(username=request.user.username)
                     user.set_password(pass_new)
                     user.save()
-                    return HttpResponseRedirect('/join')
+                    return redirect('/join')
                 else:
-                    return HttpResponse('Wrong password')
+                    messages.error(request, 'Wrong password!')
+                    return render(request, 'settings.html')
             else:
-                return HttpResponse('Password do not match')
+                messages.error(request, 'Passwords do not match!')
+                return render(request, 'settings.html')
         else:
-            return HttpResponseRedirect('/')
+            return redirect('/')
     else:
         return render(request, 'settings.html')
 
@@ -152,14 +165,14 @@ def post_edit(request, url_code):
         repost = False
         return render(request, 'post_create.html', {'categories': categories, 'cities': cities, 'item': item, 'repost': repost})
     else:
-        return HttpResponseRedirect('/')
+        return redirect('/')
 
 @login_required
 def post_repost(request, url_code):
     try:
         Item.objects.get(url_code=url_code, is_removed=True).user == request.user
     except Item.DoesNotExist:
-        return HttpResponseRedirect('/')
+        return redirect('/')
     else:
         categories = Category.objects.order_by('kor_name')
         zipcode = request.user.customer.zipcode.number
@@ -178,7 +191,7 @@ def post_remove(request):
         item.is_removed=True
         item.save()
 
-        return HttpResponseRedirect('/store/manage')
+        return redirect('/store/manage')
 
 @login_required
 def post_process(request):
@@ -207,9 +220,8 @@ def post_process(request):
 
             item.save()
 
-            success_alert = 'You have successfully edited the item'
-
-            return HttpResponseRedirect('/')
+            messages.success(request, 'You have successfully edited the item')
+            return redirect('/')
 
         elif request.POST.get('create'):
             title = request.POST.get('title')
@@ -244,7 +256,7 @@ def post_process(request):
                                 img_name = url_coder(size=11)
                                 img_ext = os.path.splitext(img_filename)[1].lower()
                                 img_filename = img_name + img_ext
-                                img_filepath = os.path.join(settings.MEDIA_ROOT, img_filename)
+                                img_filepath = os.path.join(base_set.MEDIA_ROOT, img_filename)
                                 default_storage.save(img_filepath, ContentFile(image.read()))
 
                                 img_db = ItemImage(name = img_filename, location = img_filename, item=item)
@@ -254,7 +266,7 @@ def post_process(request):
                                 W = thumb.size[0] / 2
                                 H = thumb.size[1] / 2
 
-                                filepath = os.path.join(settings.MEDIA_ROOT + '/thumbs/' + img_filename)
+                                filepath = os.path.join(base_set.MEDIA_ROOT + '/thumbs/' + img_filename)
 
                                 if W > H:
                                     thumb = thumb.crop((W-H, H-H, W+H, H+H))
@@ -266,18 +278,22 @@ def post_process(request):
                                 thumb.save(filepath)
 
                             else:
-                                return HttpResponse('The image is too big')
+                                messages.error(request, 'The image is too big')
+                                return render(request, 'post_create.html')
                         else:
-                            return HttpResponse('Appropriate filetypes are jpg, png, and gif')
+                            messages.error(request, 'Appropriate filetypes are jpg, png, and gif')
+                            return render(request, 'post_create.html')
 
-                    return HttpResponseRedirect('/post/' + url_code)
+                    return redirect('/post/' + url_code)
                 else:
-                    return HttpResponse('You may only upload up to 8 images')
+                    messages.error(request, 'You may only upload up to 8 images')
+                    return render(request, 'post_create.html')
             else:
-                return HttpResponse('You need to add at least one image')
+                    messages.error(request, 'You need to add at least one image')
+                    return render(request, 'post_create.html')
         else:
             # not a POST method
-            return HttpResponseRedirect('/')
+            return redirect('/')
 
 def post(request, url_code):
     item = Item.objects.get(url_code=url_code)
@@ -285,18 +301,28 @@ def post(request, url_code):
     user = request.user
     more = Item.objects.filter(user=item.user).all().count()
     if more >= 6:
-        more_items = Item.objects.filter(user=item.user).order_by('?')[:6]
+        more_items = Item.objects.filter(user=item.user).exclude(url_code=url_code).order_by('?')[:6]
     else:
         more_items = None
 
     if request.user.is_authenticated():
         try:
-            PostView.objects.get(item=item, user=user)
+            find = PostView.objects.get(item=item, user=user)
         except PostView.DoesNotExist:
             view = PostView(item=item, user=user)
             view.save()
+        else:
+            view = PostView(item=item, user=user)
+            view.save()
+            find.delete()
+    try:
+        fave = Favorite.objects.get(item=item)
+    except Favorite.DoesNotExist:
+        favorited = False
+    else:
+        favorited = True
 
-    return render(request, 'post.html', {'item': item, 'images': images, 'more_items': more_items})
+    return render(request, 'post.html', {'item': item, 'images': images, 'more_items': more_items, 'favorited': favorited})
 
 def list(request, category=None, page=1):
     if request.user.is_authenticated():
@@ -309,7 +335,7 @@ def list(request, category=None, page=1):
 
     cat = 'new'
     if not category:
-        return HttpResponseRedirect('/list/new')
+        return redirect('/list/new')
     elif category == 'new':
         item_list = Item.objects.filter(city__in=cities, is_expired=False, is_removed=False).order_by('-pub_date')
     elif category == 'free':
@@ -320,11 +346,11 @@ def list(request, category=None, page=1):
             cat = category.slug
             item_list = Item.objects.filter(category=category, city__in=cities, is_expired=False, is_removed=False).order_by('-pub_date')
         except Category.DoesNotExist:
-            return HttpResponseRedirect('/')
+            return redirect('/')
 
     items = paginator(item_list, page)
     if not items:
-        return HttpResponseRedirect('/')
+        return redirect('/')
     else:
         return render(request, 'list.html', {'items': items, 'title': category, 'view': 'list'})
 
@@ -332,39 +358,45 @@ def list(request, category=None, page=1):
 def change_zip(request):
     if request.method == 'POST':
         zipcode = request.POST.get('zipcode')
-        zipcode = Zipcode.objects.get(number=zipcode)
-
-        if request.user.is_authenticated():
-            user = User.objects.get(username=request.user.username)
-            change = Customer.objects.get(user=user)
-            change.zipcode = zipcode
-            change.save()
-            return HttpResponseRedirect('/')
+        try:
+            zipcode = Zipcode.objects.get(number=zipcode)
+        except:
+            messages.error(request, 'That area is not yet supported')
+            return redirect('/')
         else:
-            return HttpResponseRedirect('/')
+            if request.user.is_authenticated():
+                user = User.objects.get(username=request.user.username)
+                change = Customer.objects.get(user=user)
+                change.zipcode = zipcode
+                change.save()
+                messages.success(request, 'You successfully changed your zipcode')
+                return redirect('/')
+            else:
+                return redirect('/')
     else:
-        return HttpResponseRedirect('/')
+        return redirect('/')
 
 def search(request, query='', page=1):
     items = ''
     if request.method == 'POST':
         query = request.POST.get('query')
-        return HttpResponseRedirect('/search/' + query)
+        return redirect('/search/' + query)
     else:
-        title = query
-        i = Item.objects
-        item_list = i.filter(
-                Q(title__icontains=query) | 
-                Q(details__icontains=query) | 
-                Q(category__eng_name__icontains=query) | 
-                Q(category__kor_name__icontains=query) | 
-                Q(user__username__icontains=query) | 
-                Q(city__name__icontains=query)).order_by('-pub_date')
-
-        items = paginator(item_list, page)
-        if not items:
+        if not query:
+            title = 'None'
             return HttpResponse('No results')
         else:
+            title = query
+            i = Item.objects
+            item_list = i.filter(
+                    Q(title__icontains=query) | 
+                    Q(details__icontains=query) | 
+                    Q(category__eng_name__icontains=query) | 
+                    Q(category__kor_name__icontains=query) | 
+                    Q(user__username__icontains=query) | 
+                    Q(city__name__icontains=query)).order_by('-pub_date')
+
+            items = paginator(item_list, page)
             return render(request, 'list.html', {'items': items, 'search': title, 'view': 'search'})
 
 @login_required
@@ -392,47 +424,48 @@ def message(request):
         msg.save()
 
         if request.POST.get('url_code'):
-            return HttpResponseRedirect('/inbox/' + msg_code)
+            return redirect('/inbox/' + msg_code)
         else:
-            return HttpResponseRedirect('/post/' + item_code)
+            messages.success(request, 'Message sent!')
+            return redirect('/post/' + item_code)
     else:
-        return HttpResponseRedirect('/')
+        return redirect('/')
 
 @login_required
 def inbox(request, url_code=None):
     if request.user.is_authenticated:
         user = request.user
         if Message.objects.filter(url_code=url_code):
-            messages = Message.objects.filter(url_code=url_code)
-            #sender_pk = messages.values('sender').distinct()[0]['sender']
+            msgs = Message.objects.filter(url_code=url_code)
+            #sender_pk = msgs.values('sender').distinct()[0]['sender']
             sender = User.objects.get(username=request.user)
             try:
                 recipient = Message.objects.filter(url_code=url_code, sender=sender).first().recipient
             except:
                 recipient = Message.objects.filter(url_code=url_code, recipient=sender).first().sender
-            item_pk = messages.values('item').distinct()[0]['item']
-            item_url = Item.objects.get(pk=item_pk).url_code
+            item_pk = msgs.values('item').distinct()[0]['item']
+            item = Item.objects.get(pk=item_pk)
 
             unread = Message.objects.filter(url_code=url_code, recipient=request.user, is_read=False)
             for msg in unread:
                 msg.is_read = True
                 msg.save()
 
-            return render(request, 'thread.html', {'messages':messages, 'recipient':recipient, 'item_url':item_url, 'url_code':url_code})
+            return render(request, 'thread.html', {'msgs':msgs, 'recipient':recipient, 'item':item, 'url_code':url_code})
         else:
             if url_code == None:
-                messages = Message.objects.values('url_code').annotate(date=Max('pub_date')).order_by('-date').filter(Q(sender=user)|Q(recipient=user))
-                return render(request, 'inbox.html', {'messages':messages})
+                msgs = Message.objects.values('url_code').annotate(date=Max('pub_date')).order_by('-date').filter(Q(sender=user)|Q(recipient=user))
+                return render(request, 'inbox.html', {'msgs':msgs})
             elif url_code == 'unread':
-                messages = Message.objects.values('url_code').annotate(date=Max('pub_date')).order_by('-date').filter(recipient=user, is_read=False)
-                return render(request, 'inbox.html', {'messages':messages})
+                msgs = Message.objects.values('url_code').annotate(date=Max('pub_date')).order_by('-date').filter(recipient=user, is_read=False)
+                return render(request, 'inbox.html', {'msgs':msgs})
             elif url_code == 'sent':
-                messages = Message.objects.values('url_code').annotate(date=Max('pub_date')).order_by('-date').filter(sender=user)
-                return render(request, 'inbox.html', {'messages':messages})
+                msgs = Message.objects.values('url_code').annotate(date=Max('pub_date')).order_by('-date').filter(sender=user)
+                return render(request, 'inbox.html', {'msgs':msgs})
             else:
-                return HttpResponseRedirect('/inbox')
+                return redirect('/inbox')
     else:
-        return HttpResponseRedirect('/')
+        return redirect('/')
 
 @login_required
 def bot(request):
@@ -444,7 +477,7 @@ def bot(request):
 
             url_code = missy_parser(url, cat, city)
 
-            return HttpResponseRedirect('/post/' + url_code)
+            return redirect('/post/' + url_code)
         else:
             categories = Category.objects.order_by('eng_name')
             zipcode = request.user.customer.zipcode.number
@@ -453,7 +486,7 @@ def bot(request):
             cities = City.objects.filter(state__in=states).order_by('name')
             return render(request, 'bot.html', {'categories': categories, 'cities': cities})
     else:
-        return HttpResponseRedirect('/')
+        return redirect('/')
 
 @login_required
 def store_manage(request):
@@ -471,6 +504,49 @@ def store(request, seller, page=1):
 
         items = paginator(item_list, page)
         if not items:
-            return HttpResponse(items)
+            return HttpResponseRedirect('/')
         else:
             return render(request, 'list.html', {'items':items, 'title':title, 'seller':user.username, 'view':'store'})
+
+def history(request, page=1):
+    if request.user.is_authenticated():
+        title = 'history'
+        views = PostView.objects.filter(user=request.user).values('item')
+        item_list = Item.objects.filter(pk__in=views)[::-1]
+        items = paginator(item_list, page)
+        if not items:
+            return redirect('/')
+        else:
+            return render(request, 'list.html', {'items':items, 'title':title})
+    else:
+        return redirect('/')
+
+def favorites(request, page=1):
+    if request.user.is_authenticated():
+        # process favorites
+        if request.method == 'POST':
+            item_code = request.POST.get('item_code')
+            item = Item.objects.get(url_code=item_code)
+            try:
+                find = Favorite.objects.get(item=item)
+            except Favorite.DoesNotExist:
+                fave = Favorite(user=request.user, item=item, fav_date=timezone.now())
+                fave.save()
+                messages.success(request, 'Favorited ' + item.title)
+            else:
+                find.delete()
+                messages.success(request, 'Unfavorited ' + item.title)
+
+            return redirect('/post/' + item_code)
+        # list favorites
+        else:
+            title = 'favorites'
+            faves = Favorite.objects.filter(user=request.user).values('item')
+            item_list = Item.objects.filter(pk__in=faves)[::-1]
+            items = paginator(item_list, page)
+            if not items:
+                return redirect('/')
+            else:
+                return render(request, 'list.html', {'items':items, 'title':title})
+    else:
+        return redirect('/')

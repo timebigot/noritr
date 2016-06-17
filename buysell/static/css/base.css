@@ -10,6 +10,11 @@ a:focus, a:hover {
 .material-icons {
     vertical-align: -14%;
 }
+.container-fluid {
+    padding-top: 25px;
+    padding-left: 0px;
+    padding-right: 0px;
+}
 
 /* header */
 .navbar-lg {
@@ -95,13 +100,19 @@ a:focus, a:hover {
 }
 
 /*post*/
+.btn-margin {
+    margin-top: 5px;
+}
 a.list-group-item {
     color: #333;
+}
+#map {
+height: 300px;
 }
 
 /*inbox*/
 .inbox-media {
-    width: 150px;
+    width: 100px;
 }
 .compose-box {
     padding-bottom: 50px;

@@ -28,6 +28,10 @@ urlpatterns = [
     url(r'^store/manage/$', views.store_manage, name='store_manage'),
     url(r'^store/(?P<seller>[^\/]+)/$', views.store, name='store'),
     url(r'^store/(?P<seller>[^\/]+)/(?P<page>\d+)/$', views.store, name='store_page'),
+    url(r'^history/$', views.history, name='history'),
+    url(r'^history/(?P<page>\d+)/$', views.history, name='history_page'),
+    url(r'^favorites/$', views.favorites, name='favorites'),
+    url(r'^favorites/(?P<page>\d+)/$', views.favorites, name='favorites_page'),
 ]
 
 if settings.DEBUG:

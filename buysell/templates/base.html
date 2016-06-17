@@ -1,4 +1,3 @@
-{% load tags %}
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -15,9 +14,12 @@
         <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Roboto' type='text/css'>
         <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.css">
         <link rel="stylesheet" href="{% static 'css/base.css' %}">
+        <style type="text/css">
+        </style>
         {% block index_style %}{% endblock %}
     </head>
 
+    {% load tags %}
     <body>
         <header class="navbar-lg hidden-sm hidden-xs">
             <div class="container navbar-main">
@@ -60,7 +62,8 @@
                                     <ul class="dropdown-menu dropdown-menu-right">
                                         <li><a href="{% url 'inbox' %}"><i class="fa fa-envelope-o" aria-hidden="true"></i> MESSAGES {% if user|unread_msg %} <span class="badge badge-red">{{ user|unread_msg }}</span> {% endif %}</a></li>
                                         <li><a href="{% url 'store_manage' %}"><i class="fa fa-shopping-basket" aria-hidden="true"></i> MY STORE</a></li>
-                                        <li><a href=""><i class="fa fa-thumb-tack" aria-hidden="true"></i> SAVED</a></li>
+                                        <li><a href="{% url 'favorites' %}"><i class="fa fa-star-o" aria-hidden="true"></i> FAVORITES</a></li>
+                                        <li><a href="{% url 'history' %}"><i class="fa fa-hourglass-half" aria-hidden="true"></i> HISTORY</a></li>
                                         <li><a href="{% url 'settings' %}"><i class="fa fa-cog" aria-hidden="true"></i> SETTINGS</a></li>
                                         <li role="separator" class="divider"></li>
                                         <li><a href="{% url 'logout' %}"><i class="fa fa-power-off" aria-hidden="true"></i> LOGOUT</a></li>
@@ -122,6 +125,29 @@
             <hr class="navbar-border">
         </header>
 
+        {% block messages %}
+        {% if messages %}
+        <section>
+            <br>
+            <div class="container">
+                {% for message in messages %}
+                <div{% if message.tags %} class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}" role="{{ message.tags }}"{% endif %}>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    {% if message.tags == 'success' %}
+                    <i class="fa fa-check" aria-hidden="true"></i>
+                    {% elif message.tags == 'error' %}
+                    <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+                    {% endif %}
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+        {% endblock messages %}
+
         <main class="hidden-xs hidden-sm hidden-md hidden-lg" id="mainSearch">
         <div class="container" align="center">
             <br>
@@ -144,7 +170,8 @@
             <br>
             <div class="list-group">
                 <a href="/" class="list-group-item list-group-item-info">HOME</a>
-                <br>
+            </div>
+            <div class="list-group">
                 <a href="{% url 'list_cat' category='new' %}" class="list-group-item">NEW</a>
                 {% get_cats as cats %}
                 {% for cat in cats %}
@@ -177,10 +204,17 @@
                 <a href="{% url 'store_manage' %}" class="list-group-item">
                     <i class="fa fa-shopping-basket" aria-hidden="true"></i> MANAGE STORE
                 </a>
+                <a href="{% url 'favorites' %}" class="list-group-item">
+                    <i class="fa fa-star-o" aria-hidden="true"></i> FAVORITES
+                </a>
+                <a href="{% url 'history' %}" class="list-group-item">
+                    <i class="fa fa-hourglass-half" aria-hidden="true"></i> HISTORY
+                </a>
                 <a href="{% url 'settings' %}" class="list-group-item">
                     <i class="fa fa-cog" aria-hidden="true"></i> SETTINGS
                 </a>
-                <br>
+            </div>
+            <div class="list-group">
                 <a href="{% url 'logout' %}" class="list-group-item">
                     <i class="fa fa-power-off" aria-hidden="true"></i> LOGOUT
                 </a>
@@ -221,14 +255,22 @@
         <footer>
             <hr>
             <div class="container">
-                <p align="center">&copy; {% now "Y"%}, Noritr.com</p>
+                <div align="center">
+                    <a href="">About</a> &middot; 
+                    <a href="">Contact</a> &middot; 
+                    <a href="">FAQ</a>
+                </div>
+                <p align="center">&copy; {% now "Y"%} Noritr.com</p>
             </div>
         </footer>
+        {% gmaps as gmaps_key %}
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
         <script src="http://cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.js"></script>
         <script src="{% static 'js/base.js' %}"></script>
-
+        {% if '/post' in request.path %}
+        <script src="https://maps.googleapis.com/maps/api/js?key={{ gmaps_key }}&callback=initMap" async defer></script>
+        {% endif %}
         {% block scripts %}
         {% endblock %}
 

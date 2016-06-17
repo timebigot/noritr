@@ -5,6 +5,7 @@ Message: {{ recipient }}
 {% endblock %}
 {% block content %}
 {% load humanize %}
+{% load tags %}
 
 <div class="container">
     <h3>Message: {{ recipient }}</h3>
@@ -15,17 +16,48 @@ Message: {{ recipient }}
             {% include 'inbox_sidebar.html' %}
         </div>
         <div class="col-md-9">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="media">
+                        <div class="media-left">
+                            <a href="{% url 'post' item.url_code %}">
+                                <img class="media-object inbox-media" src="/img/thumbs/{{ item.itemimage_set.first }}" alt="{{ item.title }}" width="128px">
+                            </a>
+                        </div>
+                        <div class="media-body">
+                            <a href="{% url 'post' item.url_code %}">
+                                <h4 class="media-heading">{{ item.title }}
+                                    <div class="pull-right">
+                                        {% if item.price == '0' %}
+                                        <span class="label label-danger">FREE</span>
+                                        {% else %}
+                                        <span class="label label-primary">${{ item.price }}</span>
+                                        {% endif %}
+
+                                        {% if item.pub_date|new_item %}
+                                        <span class="label label-success">NEW</span>
+                                        {% endif %}
+                                    </div>
+                                </h4>
+                            </a>
+                            <br>
+                            <a href="{% url 'store' item.user %}"><p>{{ item.user }}</p></a>
+                            <a href="{% url 'search' item.city.name %}"><p>{{ item.city }}</p></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <ul class="list-group">
-                {% for msg in messages %}
+                {% for msg in msgs %}
                 <li class="list-group-item{% if not msg.is_read %} list-group-item-warning{% endif %}">
                     <div class="media">
                         <div class="media-body">
                             <div class="row">
                                 <div class="col-xs-6">
-                                <p>{{ msg.sender }}</p>
+                                    <p>{{ msg.sender }}</p>
                                 </div>
                                 <div class="col-xs-6">
-                                <p class="pull-right">{{ msg.pub_date|naturaltime }}</p>
+                                    <p class="pull-right">{{ msg.pub_date|naturaltime }}</p>
                                 </div>
                             </div>
                             <p>{{ msg.content }}</p>
@@ -40,7 +72,7 @@ Message: {{ recipient }}
                         <br>
                         <div>
                             <input type="hidden" name="recipient" value="{{ recipient }}">
-                            <input type="hidden" name="item" value="{{ item_url }}">
+                            <input type="hidden" name="item" value="{{ item.url_code }}">
                             <input type="hidden" name="url_code" value="{{ url_code }}">
                             <input class="btn btn-primary pull-right" name="submit" type="submit" value="Send">
                         </div>

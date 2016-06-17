@@ -1,9 +1,15 @@
 from django import template
+from django.conf import settings as base_set
 from buysell.models import Category, Message
 from django.utils.dateformat import format
 import time
 
 register = template.Library()
+
+@register.simple_tag
+def gmaps():
+    keys = base_set.GMAPS_KEY
+    return keys
 
 @register.simple_tag
 def get_cats():

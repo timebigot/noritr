@@ -89,6 +89,7 @@ class ItemImage(models.Model):
 class PostView(models.Model):
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    view_date = models.DateTimeField(null=True)
 
     def __str__(self):
         return '%s - %s' % (self.item, self.user)
@@ -104,3 +105,8 @@ class Message(models.Model):
 
     def __str__(self):
         return '%s - %s: %s' % (self.url_code, self.sender, self.content)
+
+class Favorite(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    item = models.ForeignKey(Item, on_delete=models.CASCADE)
+    fav_date = models.DateTimeField(default=datetime.now)
