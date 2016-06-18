@@ -23,6 +23,7 @@
         {% for item in items_rand %}
         {% include "card.html" %}
         {% endfor %}
+
         <div class="container">
             <h3>New Arrivals 
                 <small><a class="btn btn-default pull-right" href="/list/new" role="button">See more</a></small>
@@ -31,6 +32,17 @@
         {% for item in items_new %}
         {% include "card.html" %}
         {% endfor %}
+
+        {% if items_saved %}
+        <div class="container">
+            <h3>Favorites
+                <small><a class="btn btn-default pull-right" href="{% url 'favorites' %}" role="button">See more</a></small>
+            </h3>
+        </div>
+        {% for item in items_saved %}
+        {% include "card.html" %}
+        {% endfor %}
+        {% endif %}
     </div>
 </div>
 {% endblock %}

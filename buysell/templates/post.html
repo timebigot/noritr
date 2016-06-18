@@ -34,6 +34,9 @@
             <a role="button" class="btn btn-primary btn-lg btn-block" href="/join?next=/post/{{ item.url_code }}">
                 <i class="fa fa-envelope-o" aria-hidden="true"></i> Message {{ item.user }}
             </a>
+            <a role="button" class="btn btn-default btn-lg btn-block" href="/join?next=/post/{{ item.url_code }}">
+                <i class="fa fa-star-o" aria-hidden="true"></i> Favorite
+            </a>
             {% elif request.user.is_authenticated and request.user != item.user %}
             <button type="button" class="btn btn-primary btn-lg btn-block" data-toggle="modal" data-target="#contact">
                 <i class="fa fa-envelope-o" aria-hidden="true"></i> Message {{ item.user }}

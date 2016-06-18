@@ -31,8 +31,13 @@ def index(request):
     one_day = datetime.now() - timedelta(hours=24)
     items_new = Item.objects.filter(city__in=cities, is_expired=False, is_removed=False).order_by('-pub_date')[:12]
     items_rand = Item.objects.filter(city__in=cities, pub_date__lte=one_day).order_by('?')[:6]
+    items_saved = []
+    faves = Favorite.objects.filter(user=request.user).values('item').order_by('-pk')[:6]
+    for fave in faves:
+        fave_item = Item.objects.get(pk=fave['item'])
+        items_saved.append(fave_item)
 
-    return render(request, 'index.html', {'items_new': items_new, 'items_rand': items_rand})
+    return render(request, 'index.html', {'items_new': items_new, 'items_rand': items_rand, 'items_saved': items_saved})
 
 def join(request):
     if request.user.is_authenticated():
@@ -59,8 +64,7 @@ def sign_up(request):
             zipcode = Zipcode.objects.get(number=zipcode)
         except:
             messages.error(request, 'Area not supported')
-
-        if not messages:
+        else:
             user = User.objects.create_user(username, email, password)
             add = Customer(user=user, zipcode=zipcode)
             add.save()
@@ -297,32 +301,36 @@ def post_process(request):
 
 def post(request, url_code):
     item = Item.objects.get(url_code=url_code)
-    images = ItemImage.objects.filter(item=item)
-    user = request.user
-    more = Item.objects.filter(user=item.user).all().count()
-    if more >= 6:
-        more_items = Item.objects.filter(user=item.user).exclude(url_code=url_code).order_by('?')[:6]
-    else:
-        more_items = None
-
-    if request.user.is_authenticated():
-        try:
-            find = PostView.objects.get(item=item, user=user)
-        except PostView.DoesNotExist:
-            view = PostView(item=item, user=user)
-            view.save()
+    if item.user == request.user and not item.is_removed:
+        images = ItemImage.objects.filter(item=item)
+        user = request.user
+        more = Item.objects.filter(user=item.user).all().count()
+        if more >= 6:
+            more_items = Item.objects.filter(user=item.user).exclude(url_code=url_code).order_by('?')[:6]
         else:
-            view = PostView(item=item, user=user)
-            view.save()
-            find.delete()
-    try:
-        fave = Favorite.objects.get(item=item)
-    except Favorite.DoesNotExist:
-        favorited = False
-    else:
-        favorited = True
+            more_items = None
 
-    return render(request, 'post.html', {'item': item, 'images': images, 'more_items': more_items, 'favorited': favorited})
+        if request.user.is_authenticated():
+            try:
+                find = PostView.objects.get(item=item, user=user)
+            except PostView.DoesNotExist:
+                view = PostView(item=item, user=user)
+                view.save()
+            else:
+                view = PostView(item=item, user=user)
+                view.save()
+                find.delete()
+        try:
+            fave = Favorite.objects.get(item=item)
+        except Favorite.DoesNotExist:
+            favorited = False
+        else:
+            favorited = True
+
+        return render(request, 'post.html', {'item': item, 'images': images, 'more_items': more_items, 'favorited': favorited})
+    else:
+        messages.error(request, 'This item has been removed')
+        return redirect('/')
 
 def list(request, category=None, page=1):
     if request.user.is_authenticated():
@@ -337,14 +345,17 @@ def list(request, category=None, page=1):
     if not category:
         return redirect('/list/new')
     elif category == 'new':
-        item_list = Item.objects.filter(city__in=cities, is_expired=False, is_removed=False).order_by('-pub_date')
+        item_list = Item.objects.filter(city__in=cities, is_expired=False, is_removed=False).order_by('-pub_date').exclude(is_removed=True)
+
     elif category == 'free':
-        item_list = Item.objects.filter(city__in=cities, price='0', is_expired=False, is_removed=False).order_by('-pub_date')
+        item_list = Item.objects.filter(city__in=cities, price='0', is_expired=False, is_removed=False).order_by('-pub_date').exclude(is_removed=True)
+
     else:
         try:
             category = Category.objects.get(slug=category)
             cat = category.slug
-            item_list = Item.objects.filter(category=category, city__in=cities, is_expired=False, is_removed=False).order_by('-pub_date')
+            item_list = Item.objects.filter(category=category, city__in=cities, is_expired=False, is_removed=False).order_by('-pub_date').exclude(is_removed=True)
+
         except Category.DoesNotExist:
             return redirect('/')
 
@@ -395,6 +406,8 @@ def search(request, query='', page=1):
                     Q(category__kor_name__icontains=query) | 
                     Q(user__username__icontains=query) | 
                     Q(city__name__icontains=query)).order_by('-pub_date')
+            item_list = item_list.exclude(is_removed=True)
+
 
             items = paginator(item_list, page)
             return render(request, 'list.html', {'items': items, 'search': title, 'view': 'search'})
@@ -437,19 +450,21 @@ def inbox(request, url_code=None):
         user = request.user
         if Message.objects.filter(url_code=url_code):
             msgs = Message.objects.filter(url_code=url_code)
-            #sender_pk = msgs.values('sender').distinct()[0]['sender']
-            sender = User.objects.get(username=request.user)
-            try:
-                recipient = Message.objects.filter(url_code=url_code, sender=sender).first().recipient
-            except:
-                recipient = Message.objects.filter(url_code=url_code, recipient=sender).first().sender
-            item_pk = msgs.values('item').distinct()[0]['item']
-            item = Item.objects.get(pk=item_pk)
+            user = User.objects.get(username=request.user.username)
+            if not msgs.exclude(sender=user, recipient=user):
+                try:
+                    recipient = Message.objects.filter(url_code=url_code, sender=user).first().recipient
+                except:
+                    recipient = Message.objects.filter(url_code=url_code, recipient=user).first().sender
+                item_pk = msgs.values('item').distinct()[0]['item']
+                item = Item.objects.get(pk=item_pk)
 
-            unread = Message.objects.filter(url_code=url_code, recipient=request.user, is_read=False)
-            for msg in unread:
-                msg.is_read = True
-                msg.save()
+                unread = Message.objects.filter(url_code=url_code, recipient=request.user, is_read=False)
+                for msg in unread:
+                    msg.is_read = True
+                    msg.save()
+            else:
+                return redirect('/')
 
             return render(request, 'thread.html', {'msgs':msgs, 'recipient':recipient, 'item':item, 'url_code':url_code})
         else:
@@ -499,20 +514,24 @@ def store(request, seller, page=1):
     except User.DoesNotExist:
         return HttpResponse(user)
     else:
-        item_list = Item.objects.filter(user=user).all().order_by('-pub_date')
+        item_list = Item.objects.filter(user=user).all().order_by('-pub_date').exclude(is_removed=True)
         title = user.username + "'s Store"
 
         items = paginator(item_list, page)
         if not items:
-            return HttpResponseRedirect('/')
+            return redirect('/')
         else:
             return render(request, 'list.html', {'items':items, 'title':title, 'seller':user.username, 'view':'store'})
 
+@login_required
 def history(request, page=1):
     if request.user.is_authenticated():
         title = 'history'
-        views = PostView.objects.filter(user=request.user).values('item')
-        item_list = Item.objects.filter(pk__in=views)[::-1]
+        views = PostView.objects.filter(user=request.user).values('item').order_by('-pk')
+        item_list = []
+        for view in views:
+            view_item = Item.objects.get(pk=view['item'])
+            item_list.append(view_item)
         items = paginator(item_list, page)
         if not items:
             return redirect('/')
@@ -521,6 +540,7 @@ def history(request, page=1):
     else:
         return redirect('/')
 
+@login_required
 def favorites(request, page=1):
     if request.user.is_authenticated():
         # process favorites
@@ -541,8 +561,11 @@ def favorites(request, page=1):
         # list favorites
         else:
             title = 'favorites'
-            faves = Favorite.objects.filter(user=request.user).values('item')
-            item_list = Item.objects.filter(pk__in=faves)[::-1]
+            faves = Favorite.objects.filter(user=request.user).values('item').order_by('-pk')
+            item_list = []
+            for fave in faves:
+                fave_item = Item.objects.get(pk=fave['item'])
+                item_list.append(fave_item)
             items = paginator(item_list, page)
             if not items:
                 return redirect('/')
