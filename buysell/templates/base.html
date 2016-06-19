@@ -15,21 +15,70 @@
         <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.css">
         <link rel="stylesheet" href="{% static 'css/base.css' %}">
         {% block index_style %}{% endblock %}
+
+        <link rel="apple-touch-icon" sizes="57x57" href="{% static 'img/favicons/apple-touch-icon-57x57.png' %}">
+        <link rel="apple-touch-icon" sizes="60x60" href="{% static 'img/favicons/apple-touch-icon-60x60.png' %}">
+        <link rel="apple-touch-icon" sizes="72x72" href="{% static 'img/favicons/apple-touch-icon-72x72.png' %}">
+        <link rel="apple-touch-icon" sizes="76x76" href="{% static 'img/favicons/apple-touch-icon-76x76.png' %}">
+        <link rel="apple-touch-icon" sizes="114x114" href="{% static 'img/favicons/apple-touch-icon-114x114.png' %}">
+        <link rel="apple-touch-icon" sizes="120x120" href="{% static 'img/favicons/apple-touch-icon-120x120.png' %}">
+        <link rel="apple-touch-icon" sizes="144x144" href="{% static 'img/favicons/apple-touch-icon-144x144.png' %}">
+        <link rel="apple-touch-icon" sizes="152x152" href="{% static 'img/favicons/apple-touch-icon-152x152.png' %}">
+        <link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/favicons/apple-touch-icon-180x180.png' %}">
+        <link rel="icon" type="image/png" href="{% static 'img/favicons/favicon-32x32.png' %}" sizes="32x32">
+        <link rel="icon" type="image/png" href="{% static 'img/favicons/android-chrome-192x192.png' %}" sizes="192x192">
+        <link rel="icon" type="image/png" href="{% static 'img/favicons/favicon-96x96.png' %}" sizes="96x96">
+        <link rel="icon" type="image/png" href="{% static 'img/favicons/favicon-16x16.png' %}" sizes="16x16">
+        <link rel="manifest" href="{% static 'img/favicons/manifest.json' %}">
+        <link rel="mask-icon" href="{% static 'img/favicons/safari-pinned-tab.svg' %}" color="#5bbad5">
+        <meta name="apple-mobile-web-app-title" content="Noritr">
+        <meta name="application-name" content="Noritr">
+        <meta name="msapplication-TileColor" content="#da532c">
+        <meta name="msapplication-TileImage" content="{% static 'img/favicons/mstile-144x144.png' %}">
+        <meta name="theme-color" content="#ffffff">
     </head>
 
     {% load tags %}
     <body>
+
+        {% block messages %}
+        {% if messages %}
+        <section>
+            <br>
+            <div class="container">
+                {% for message in messages %}
+                <div{% if message.tags %} class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}" role="{{ message.tags }}"{% endif %}>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    {% if message.tags == 'success' %}
+                    <i class="fa fa-check" aria-hidden="true"></i>
+                    {% elif message.tags == 'error' %}
+                    <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+                    {% endif %}
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+        {% endblock messages %}
+
         <header class="navbar-lg hidden-sm hidden-xs">
             <div class="container navbar-main">
                 <div class="row">
                     <div class="col-xs-3">
                         <div class="row">
-                            <div class="col-xs-4">
-                                <a href="/"><h4>4989</h4></a>
+                            <div class="col-xs-5">
+                                <a href="/" data-toggle="tooltip" data-placement="bottom" title="4989 βETA">
+                                    <h4>
+                                        4989 <i class="fa fa-flask text-success" aria-hidden="true"></i>
+                                    </h4>
+                                </a>
                             </div>
-                            <div class="col-xs-8 zip-change">
+                            <div class="col-xs-7 zip-change">
                                 {% if user.customer.zipcode.city %}
-                                <a href="" data-toggle="modal" data-target="#changeZip">
+                                <a href="" data-toggle="modal" data-target="#changeZip" data-toggle="tooltip" data-placement="bottom" title="Change your location">
                                     <i class="fa fa-map-marker" aria-hidden="true"></i> 
                                     {{ user.customer.zipcode.city }}
                                 </a>
@@ -55,11 +104,11 @@
                                 {% if user.is_authenticated %}
                                 <li role="presentation" class="dropdown">
                                     <a class="dropdown-toggle" data-toggle="dropdown" href="" role="button" aria-haspopup="true" aria-expanded="false">
-                                        {{ user.username }} {% if user|unread_msg %} <span class="badge badge-red">{{ user|unread_msg }}</span> {% endif %}<span class="caret"></span>
+                                <i class="fa fa-user" aria-hidden="true"></i> {{ user.username }} {% if user|unread_msg %} <span class="badge badge-red">{{ user|unread_msg }}</span> {% endif %}<span class="caret"></span>
                                     </a>
                                     <ul class="dropdown-menu dropdown-menu-right">
                                         <li><a href="{% url 'inbox' %}"><i class="fa fa-envelope-o" aria-hidden="true"></i> MESSAGES {% if user|unread_msg %} <span class="badge badge-red">{{ user|unread_msg }}</span> {% endif %}</a></li>
-                                        <li><a href="{% url 'store_manage' %}"><i class="fa fa-shopping-basket" aria-hidden="true"></i> MY STORE</a></li>
+                                        <li><a href="{% url 'store_manage' %}"><i class="fa fa-shopping-basket" aria-hidden="true"></i> MANAGE STORE</a></li>
                                         <li><a href="{% url 'favorites' %}"><i class="fa fa-star-o" aria-hidden="true"></i> FAVORITES</a></li>
                                         <li><a href="{% url 'history' %}"><i class="fa fa-hourglass-half" aria-hidden="true"></i> HISTORY</a></li>
                                         <li><a href="{% url 'settings' %}"><i class="fa fa-cog" aria-hidden="true"></i> SETTINGS</a></li>
@@ -70,7 +119,7 @@
                                 {% else %}
                                 <li role="presentation"><a href="{% url 'join' %}">JOIN</a></li>
                                 {% endif %}
-                                <a href="{% url 'post_create' %}" class="btn btn-primary btn-post" role="button">POST</a>
+                                <a href="{% url 'post_create' %}" class="btn btn-success btn-post" role="button">POST</a>
                             </ul>
                         </div><!--pull-right-->
                     </div><!--col-xs-3-->
@@ -80,18 +129,18 @@
             {% get_cats as cats %}
             <div class="container navcat">
                 <ul class="nav nav-pills nav-justified">
-                    <li role="presentation"><a class="navcat-new" href="{% url 'list_cat' category='new' %}">NEW</a></li>
+                    <li role="presentation"><a class="navcat-new text-success" href="{% url 'list_cat' category='new' %}">NEW</a></li>
                     {% for cat in cats %}
-                    <li role="presentation"><a href="{% url 'list_cat' category=cat.slug %}"><div class="text-nowrap">{{ cat.kor_name }}</div></a></li>
+                    <li role="presentation"><a class="text-success" href="{% url 'list_cat' category=cat.slug %}"><div class="text-nowrap">{{ cat.kor_name }}</div></a></li>
                     {% endfor %}
-                    <li role="presentation"><a class="navcat-free" href="{% url 'list_cat' category='free' %}">FREE</a></li>
+                    <li role="presentation"><a class="navcat-free text-success" href="{% url 'list_cat' category='free' %}">FREE</a></li>
                 </ul>
             </div>
         </header>
         <header class="navbar-xs hidden-lg hidden-md">
             <div class="container navbar-main">
                 <div class="row">
-                    <div class="col-xs-5">
+                    <div class="col-xs-4">
                         <div class="pull-left">
                             <a id="buttonSearch">
                                 <h4>
@@ -100,14 +149,16 @@
                             </a>
                         </div>
                     </div>
-                    <div class="col-xs-2">
+                    <div class="col-xs-4">
                         <div align="center">
                             <a href="/">
-                                <h4><b>4989</b></h4>
+                                <h4>
+                                    <b>4989 <i class="fa fa-flask text-success" aria-hidden="true"></i></b>
+                                </h4>
                             </a>
                         </div>
                     </div>
-                    <div class="col-xs-5">
+                    <div class="col-xs-4">
                         <div class="pull-right">
                             <a id="buttonUser">
                                 <h4><i class="fa fa-user" aria-hidden="true"></i>
@@ -122,29 +173,6 @@
             </div>
             <hr class="navbar-border">
         </header>
-
-        {% block messages %}
-        {% if messages %}
-        <section>
-            <br>
-            <div class="container">
-                {% for message in messages %}
-                <div{% if message.tags %} class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}" role="{{ message.tags }}"{% endif %}>
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                    {% if message.tags == 'success' %}
-                    <i class="fa fa-check" aria-hidden="true"></i>
-                    {% elif message.tags == 'error' %}
-                    <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
-                    {% endif %}
-                    {{ message }}
-                </div>
-                {% endfor %}
-            </div>
-        </section>
-        {% endif %}
-        {% endblock messages %}
 
         <main class="hidden-xs hidden-sm hidden-md hidden-lg" id="mainSearch">
         <div class="container" align="center">
@@ -167,7 +195,7 @@
             </form>
             <br>
             <div class="list-group">
-                <a href="/" class="list-group-item list-group-item-info">HOME</a>
+                <a href="/" class="list-group-item">HOME</a>
             </div>
             <div class="list-group">
                 <a href="{% url 'list_cat' category='new' %}" class="list-group-item">NEW</a>
@@ -183,7 +211,7 @@
         <main class="hidden-xs hidden-sm hidden-md hidden-lg" id="mainUser">
         <div class="container">
             <br>
-            <a href="{% url 'post_create' %}" class="btn btn-primary btn-lg btn-block btn-post" role="button">POST AN ITEM</a>
+            <a href="{% url 'post_create' %}" class="btn btn-success btn-lg btn-block btn-post" role="button">POST AN ITEM</a>
             <br>
             {% if not user.is_authenticated %}
             <a href="{% url 'join' %}" class="btn btn-default btn-lg btn-block btn-post" role="button">LOGIN/SIGNUP</a>
@@ -234,7 +262,7 @@
                                 <div class="input-group">
                                     <input type="number" class="form-control" placeholder="Enter a valid zipcode" name="zipcode" min="1000" max="99999">
                                     <span class="input-group-btn">
-                                        <button class="btn btn-primary" type="submit">Update</button>
+                                        <button class="btn btn-success" type="submit">Update</button>
                                     </span>
                                 </div><!-- /input-group -->
                             </form>
@@ -251,13 +279,16 @@
         </main>
 
         <footer>
-            <hr>
+            <br>
             <div class="container">
+                <!--
                 <div align="center">
                     <a href="">About</a> &middot; 
                     <a href="">Contact</a> &middot; 
                     <a href="">FAQ</a>
                 </div>
+                -->
+                <p align="center">Made with <i class="fa fa-heart text-danger" aria-hidden="true"></i> in VA</p>
                 <p align="center">&copy; {% now "Y"%} Noritr.com</p>
             </div>
         </footer>

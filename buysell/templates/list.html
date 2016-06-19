@@ -14,20 +14,22 @@
 {% block content %}
 {% load staticfiles %}
 {% load tags %}
-<div class="jumbotron">
-    <div class="container">
+<div class="container">
+    <div class="jumbotron" style="background-image: url({% static 'img/' %}{{ img_title }}.jpg); background-size: cover; background-position: center">
         <div align="center">
-            <h2>
-            {% if title.kor_name %}
-            {{ title.kor_name }}
-            {% elif title == 'new' or title == 'free' or title == 'history' or title == 'favorites' %}
-            {{ title|title }}
-            {% elif title %}
-            {{ title }}
-            {% elif search %}
-            Search: {{ search }}
-            {% endif %}
-            </h2>
+            <h1>
+                <b>
+                    {% if title.kor_name %}
+                    {{ title.kor_name }}
+                    {% elif title == 'new' or title == 'free' or title == 'history' or title == 'favorites' %}
+                    {{ title|title }}
+                    {% elif title %}
+                    {{ title }}
+                    {% elif search %}
+                    Search: {{ search }}
+                    {% endif %}
+                </b>
+            </h1>
         </div>
     </div>
 </div>

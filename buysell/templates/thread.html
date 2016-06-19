@@ -49,7 +49,7 @@ Message: {{ recipient }}
             </div>
             <ul class="list-group">
                 {% for msg in msgs %}
-                <li class="list-group-item{% if not msg.is_read %} list-group-item-warning{% endif %}">
+                <li class="list-group-item{% if not msg.is_read %} list-group-item-info{% endif %}">
                     <div class="media">
                         <div class="media-body">
                             <div class="row">

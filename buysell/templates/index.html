@@ -4,29 +4,42 @@
 {% load staticfiles %}
 {% load tags %}
 
-<div class="jumbotron">
-    <div class="container">
+<div class="container">
+    <div class="jumbotron" style="background-image: url({% static 'img/index.jpg' %}); background-size: cover; background-position: center">
         <div align="center">
-            {% if user.is_authenticated %}
-            <h2>Welcome, {{ user }}!</h2>
-            {% else %}
-            <h2>Welcome to 4989</h2>
-            {% endif %}
+            <h1>
+                <b>
+                    {% if user.is_authenticated %}
+                    Welcome, {{ user }}!
+                    {% else %}
+                    Welcome to 4989
+                    {% endif %}
+                </b>
+            </h1>
         </div>
     </div>
 </div>
 <div class="container">
     <div class="row">
         <div class="container">
-            <h3>Featured</h3>
+            <h3>
+                <i class="fa fa-certificate" aria-hidden="true"></i>
+                Featured
+            </h3>
         </div>
         {% for item in items_rand %}
         {% include "card.html" %}
         {% endfor %}
 
         <div class="container">
-            <h3>New Arrivals 
-                <small><a class="btn btn-default pull-right" href="/list/new" role="button">See more</a></small>
+            <h3>
+                <i class="fa fa-history fa-flip-horizontal" aria-hidden="true"></i>
+                New Arrivals 
+                <small>
+                    <a class="btn btn-default pull-right" href="/list/new" role="button">
+                        SEE MORE <i class="fa fa-caret-right" aira-hidden="true"></i>
+                    </a>
+                </small>
             </h3>
         </div>
         {% for item in items_new %}
@@ -35,8 +48,15 @@
 
         {% if items_saved %}
         <div class="container">
-            <h3>Favorites
-                <small><a class="btn btn-default pull-right" href="{% url 'favorites' %}" role="button">See more</a></small>
+            <h3>
+                <i class="fa fa-star-o" aria-hidden="true"></i> Favorites
+                {% if items_saved|length >= 6 %}
+                <small>
+                    <a class="btn btn-default pull-right" href="{% url 'favorites' %}" role="button">
+                        SEE ALL <i class="fa fa-caret-right" aira-hidden="true"></i>
+                    </a>
+                </small>
+                {% endif %}
             </h3>
         </div>
         {% for item in items_saved %}

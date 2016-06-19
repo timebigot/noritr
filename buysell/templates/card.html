@@ -15,13 +15,13 @@
             </a>
             <h4>
             {% if item.price == '0' %}
-            <span class="label label-danger">FREE</span>
+            <span class="label label-success-o">FREE</span>
             {% else %}
-            <span class="label label-primary">${{ item.price }}</span>
+            <span class="label label-success">${{ item.price }}</span>
             {% endif %}
 
             {% if item.pub_date|new_item %}
-            <span class="label label-success">NEW</span>
+            <span class="label label-warning">NEW</span>
             {% endif %}
             </h4>
             <p>{{ item.city }}</p>

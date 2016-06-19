@@ -19,7 +19,6 @@ from parser import missy_parser
 from django.contrib import messages
 
 def index(request):
-    print(base_set.MEDIA_ROOT)
     if request.user.is_authenticated():
         zipcode = request.user.customer.zipcode.number
         area = Zipcode.objects.get(number=zipcode).city.state.area.slug
@@ -32,10 +31,11 @@ def index(request):
     items_new = Item.objects.filter(city__in=cities, is_expired=False, is_removed=False).order_by('-pub_date')[:12]
     items_rand = Item.objects.filter(city__in=cities, pub_date__lte=one_day).order_by('?')[:6]
     items_saved = []
-    faves = Favorite.objects.filter(user=request.user).values('item').order_by('-pk')[:6]
-    for fave in faves:
-        fave_item = Item.objects.get(pk=fave['item'])
-        items_saved.append(fave_item)
+    if request.user.is_authenticated():
+        faves = Favorite.objects.filter(user=request.user).values('item').order_by('-pk')[:6]
+        for fave in faves:
+            fave_item = Item.objects.get(pk=fave['item'])
+            items_saved.append(fave_item)
 
     return render(request, 'index.html', {'items_new': items_new, 'items_rand': items_rand, 'items_saved': items_saved})
 
@@ -301,11 +301,11 @@ def post_process(request):
 
 def post(request, url_code):
     item = Item.objects.get(url_code=url_code)
-    if item.user == request.user and not item.is_removed:
+    if not item.is_removed:
         images = ItemImage.objects.filter(item=item)
         user = request.user
         more = Item.objects.filter(user=item.user).all().count()
-        if more >= 6:
+        if more > 6:
             more_items = Item.objects.filter(user=item.user).exclude(url_code=url_code).order_by('?')[:6]
         else:
             more_items = None
@@ -346,16 +346,16 @@ def list(request, category=None, page=1):
         return redirect('/list/new')
     elif category == 'new':
         item_list = Item.objects.filter(city__in=cities, is_expired=False, is_removed=False).order_by('-pub_date').exclude(is_removed=True)
-
+        img_title = 'new'
     elif category == 'free':
         item_list = Item.objects.filter(city__in=cities, price='0', is_expired=False, is_removed=False).order_by('-pub_date').exclude(is_removed=True)
-
+        img_title = 'free'
     else:
         try:
             category = Category.objects.get(slug=category)
             cat = category.slug
             item_list = Item.objects.filter(category=category, city__in=cities, is_expired=False, is_removed=False).order_by('-pub_date').exclude(is_removed=True)
-
+            img_title = category.slug
         except Category.DoesNotExist:
             return redirect('/')
 
@@ -363,7 +363,7 @@ def list(request, category=None, page=1):
     if not items:
         return redirect('/')
     else:
-        return render(request, 'list.html', {'items': items, 'title': category, 'view': 'list'})
+        return render(request, 'list.html', {'items': items, 'title': category, 'view': 'list', 'img_title': img_title})
 
 @login_required
 def change_zip(request):
@@ -410,7 +410,7 @@ def search(request, query='', page=1):
 
 
             items = paginator(item_list, page)
-            return render(request, 'list.html', {'items': items, 'search': title, 'view': 'search'})
+            return render(request, 'list.html', {'items': items, 'search': title, 'view': 'search', 'img_title': 'search'})
 
 @login_required
 def message(request):
@@ -451,7 +451,7 @@ def inbox(request, url_code=None):
         if Message.objects.filter(url_code=url_code):
             msgs = Message.objects.filter(url_code=url_code)
             user = User.objects.get(username=request.user.username)
-            if not msgs.exclude(sender=user, recipient=user):
+            if not msgs.exclude(sender=user).exclude(recipient=user):
                 try:
                     recipient = Message.objects.filter(url_code=url_code, sender=user).first().recipient
                 except:
@@ -536,7 +536,7 @@ def history(request, page=1):
         if not items:
             return redirect('/')
         else:
-            return render(request, 'list.html', {'items':items, 'title':title})
+            return render(request, 'list.html', {'items':items, 'title':title, 'img_title': 'history'})
     else:
         return redirect('/')
 
@@ -570,6 +570,6 @@ def favorites(request, page=1):
             if not items:
                 return redirect('/')
             else:
-                return render(request, 'list.html', {'items':items, 'title':title})
+                return render(request, 'list.html', {'items':items, 'title':title, 'img_title': 'favorites'})
     else:
         return redirect('/')

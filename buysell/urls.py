@@ -35,5 +35,6 @@ urlpatterns = [
 ]
 
 if settings.DEBUG:
-    # static files (images, css, javascript, etc.)
     urlpatterns += patterns('', (r'^img/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}))
+else:
+    print('Production!')
