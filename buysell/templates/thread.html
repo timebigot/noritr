@@ -29,13 +29,13 @@ Message: {{ recipient }}
                                 <h4 class="media-heading">{{ item.title }}
                                     <div class="pull-right">
                                         {% if item.price == '0' %}
-                                        <span class="label label-danger">FREE</span>
+                                        <span class="label label-success-o">FREE</span>
                                         {% else %}
-                                        <span class="label label-primary">${{ item.price }}</span>
+                                        <span class="label label-success">${{ item.price }}</span>
                                         {% endif %}
 
                                         {% if item.pub_date|new_item %}
-                                        <span class="label label-success">NEW</span>
+                                        <span class="label label-warning">NEW</span>
                                         {% endif %}
                                     </div>
                                 </h4>
@@ -74,7 +74,7 @@ Message: {{ recipient }}
                             <input type="hidden" name="recipient" value="{{ recipient }}">
                             <input type="hidden" name="item" value="{{ item.url_code }}">
                             <input type="hidden" name="url_code" value="{{ url_code }}">
-                            <input class="btn btn-primary pull-right" name="submit" type="submit" value="Send">
+                            <input class="btn btn-success pull-right" name="submit" type="submit" value="Send">
                         </div>
                     </form>
                 </li>

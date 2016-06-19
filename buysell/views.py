@@ -204,7 +204,6 @@ def post_process(request):
         if request.POST.get('edit'):
             title = request.POST.get('title')
             details = request.POST.get('details')
-            price = request.POST.get('price')
             url_code = request.POST.get('item_code')
             category = request.POST.get('category')
             category = Category.objects.get(eng_name=category)
@@ -214,13 +213,15 @@ def post_process(request):
             item = Item.objects.get(url_code=url_code)
             item.title = title
             item.details = details
-            item.price = price
             item.category = category
             item.city = city
             if request.POST.get('repost'):
-                item.pub_date = timezone.now()
+                exp_date = item.pub_date + timedelta(days=item.category.days_til_expire)
+                if timezone.now() >= exp_date:
+                    #price = request.POST.get('price')
+                    #item.price = price
+                    item.pub_date = timezone.now()
                 item.is_removed = False
-                item.is_expired = False
 
             item.save()
 

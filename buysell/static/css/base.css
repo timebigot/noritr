@@ -50,6 +50,9 @@ input[type="color"]:focus,
     border-style: solid;
     padding: .1em .6em;
 }
+.label-warning {
+    background-color: #ff8800;
+}
 
 /* header */
 header {
