@@ -55,3 +55,13 @@ def unread_msg(user):
 def sent_msg(user):
     sent = Message.objects.filter(sender=user).count()
     return sent
+
+@register.simple_tag
+def img_url():
+    url = 'https://noritr-4989.s3.amazonaws.com/media/'
+    return url
+
+@register.simple_tag
+def thumb_url():
+    url = 'https://noritr-4989.s3.amazonaws.com/media/thumb_'
+    return url

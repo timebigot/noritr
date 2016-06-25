@@ -76,7 +76,7 @@
                                     </h4>
                                 </a>
                             </div>
-                            <div class="col-xs-7 zip-change">
+                            <div class="col-xs-7 navbar-a">
                                 {% if user.customer.zipcode.city %}
                                 <a href="" data-toggle="modal" data-target="#changeZip" data-toggle="tooltip" data-placement="bottom" title="Change your location">
                                     <i class="fa fa-map-marker" aria-hidden="true"></i> 
@@ -99,12 +99,11 @@
                         </form>
                     </div>
                     <div class="col-xs-3">
-                        <div class="pull-right">
-                            <ul class="nav nav-pills">
+                        <div class="row">
+                            <div class="col-md-6 navbar-a" align="center">
                                 {% if user.is_authenticated %}
-                                <li role="presentation" class="dropdown">
                                     <a class="dropdown-toggle" data-toggle="dropdown" href="" role="button" aria-haspopup="true" aria-expanded="false">
-                                <i class="fa fa-user" aria-hidden="true"></i> {{ user.username }} {% if user|unread_msg %} <span class="badge badge-red">{{ user|unread_msg }}</span> {% endif %}<span class="caret"></span>
+                                        <i class="fa fa-user" aria-hidden="true"></i> {{ user.username }} {% if user|unread_msg %} <span class="badge badge-red">{{ user|unread_msg }}</span> {% endif %}<span class="caret"></span>
                                     </a>
                                     <ul class="dropdown-menu dropdown-menu-right">
                                         <li><a href="{% url 'inbox' %}"><i class="fa fa-envelope-o" aria-hidden="true"></i> MESSAGES {% if user|unread_msg %} <span class="badge badge-red">{{ user|unread_msg }}</span> {% endif %}</a></li>
@@ -115,12 +114,13 @@
                                         <li role="separator" class="divider"></li>
                                         <li><a href="{% url 'logout' %}"><i class="fa fa-power-off" aria-hidden="true"></i> LOGOUT</a></li>
                                     </ul>
-                                </li>
                                 {% else %}
-                                <li role="presentation"><a href="{% url 'join' %}">JOIN</a></li>
+                                <a href="{% url 'join' %}">JOIN</a>
                                 {% endif %}
+                            </div>
+                            <div class="col-md-6">
                                 <a href="{% url 'post_create' %}" class="btn btn-success btn-post" role="button">POST</a>
-                            </ul>
+                            </div>
                         </div><!--pull-right-->
                     </div><!--col-xs-3-->
                 </div><!--row-->

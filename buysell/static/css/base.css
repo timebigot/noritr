@@ -73,8 +73,9 @@ header {
     padding-top: 5px;
     padding-bottom: 5px;
 }
-.zip-change {
+.navbar-a {
     margin-top: 10px;
+    align: center;
 }
 .search {
     margin-top: 3px;

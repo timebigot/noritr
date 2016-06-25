@@ -58,7 +58,7 @@ class Customer(models.Model):
     user = models.OneToOneField(User)
     zipcode = models.ForeignKey(Zipcode, on_delete=models.CASCADE, default='')
     #picture = models.ImageField(upload_to='profile_images', blank=True)
-    
+
     def __str__(self):
         return self.user.username
 

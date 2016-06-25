@@ -4,7 +4,6 @@ import json
 import os
 from urllib.request import urlopen
 from buysell.models import Item, ItemImage
-from buysell import keys
 from django.conf import settings as base_set
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile

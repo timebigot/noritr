@@ -1,10 +1,11 @@
 {% load staticfiles %}
 {% load tags %}
+{% thumb_url as t_url %}
 <div class="col-xs-6 col-sm-4 col-md-2 card">
     <div class="thumbnail">
         <a href="{% url 'post' url_code=item.url_code %}">
             {% if item.itemimage_set.all %}
-            <img src="/img/thumbs/{{ item.itemimage_set.all.first }}" alt="{{ item.title }}">
+            <img src="{{ t_url }}{{ item.itemimage_set.all.first.location }}" alt="{{ item.title }}">
             {% else %}
             <img src="{% static 'img/test.jpg' %}" alt="{{ item.title }}">
             {% endif %}

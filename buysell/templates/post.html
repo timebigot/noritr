@@ -3,6 +3,8 @@
 {% block content %}
 {% load staticfiles %}
 {% load tags %}
+{% img_url as i_url %}
+{% thumb_url as t_url %}
 
 <div class="container">
     <h2>{{ item.title }} 
@@ -21,7 +23,7 @@
             <div class="fotorama" data-nav="thumbs" data-fit="contain" data-allowfullscreen="true">
                 {% if item.itemimage_set.all %}
                 {% for image in item.itemimage_set.all %}
-                <a href="/img/{{ image }}" alt="{{ item.title }}"><img src="/img/thumbs/{{ image }}"></a>
+                <a href="{{ i_url }}{{ image }}" alt="{{ item.title }}"><img class="img-responsive" src="{{ t_url }}{{ image }}"></a>
                 {% endfor %}
                 {% else %}
                 <img src="{% static 'img/test.jpg' %}" class="img-responsive" alt="{{ item.title }}">

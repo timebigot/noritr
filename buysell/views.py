@@ -17,6 +17,8 @@ from datetime import datetime, timedelta
 from django.db.models import Count, Max
 from parser import missy_parser
 from django.contrib import messages
+from urllib.request import urlopen
+from io import BytesIO
 
 def index(request):
     if request.user.is_authenticated():
@@ -79,7 +81,7 @@ def log_in(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-        
+
         user = authenticate(username=username, password=password)
 
         if user is not None:
@@ -246,7 +248,7 @@ def post_process(request):
             if 'image' in request.FILES:
                 images = request.FILES.getlist('image')
                 number  = len(images)
-                
+
                 # image count limit is 8
                 if number <= 8:
                     for image in images:
@@ -261,26 +263,27 @@ def post_process(request):
                                 img_name = url_coder(size=11)
                                 img_ext = os.path.splitext(img_filename)[1].lower()
                                 img_filename = img_name + img_ext
-                                img_filepath = os.path.join(base_set.MEDIA_ROOT, img_filename)
+                                img_filepath = os.path.join(img_filename)
                                 default_storage.save(img_filepath, ContentFile(image.read()))
 
                                 img_db = ItemImage(name = img_filename, location = img_filename, item=item)
                                 img_db.save()
 
-                                thumb = Image.open(img_filepath)
+                                thumb = Image.open(image)
                                 W = thumb.size[0] / 2
                                 H = thumb.size[1] / 2
-
-                                filepath = os.path.join(base_set.MEDIA_ROOT + '/thumbs/' + img_filename)
 
                                 if W > H:
                                     thumb = thumb.crop((W-H, H-H, W+H, H+H))
                                     thumb = thumb.resize((350,350))
                                 elif W < H:
                                     thumb = thumb.crop((W-W, H-W, W+W, H+W))
-                                    thumb = thumb.resize((300,300))
+                                    thumb = thumb.resize((350,350))
 
-                                thumb.save(filepath)
+                                thumb_filepath = 'thumb_' + img_filename
+                                f_thumb = default_storage.open(thumb_filepath, 'w')
+                                thumb.save(f_thumb, 'png')
+                                f_thumb.close()
 
                             else:
                                 messages.error(request, 'The image is too big')
