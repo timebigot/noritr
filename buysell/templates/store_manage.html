@@ -4,6 +4,8 @@ Manage
 {% endblock %}
 
 {% block content %}
+{% load tags %}
+{% thumb_url as t_url %}
 <div class="container">
     <h3>
         Manage
@@ -44,12 +46,12 @@ Manage
                         Active
                         {% endif %}
                     </th>
-                    <th><a href="{% url 'post' item.url_code %}"><img class="img-manage" src="{{ HTTP_HOST }}/img/thumbs/{{ item.itemimage_set.first }}"></a></th>
+                    <th><a href="{% url 'post' item.url_code %}"><img class="img-manage" src="{{ t_url }}{{ item.itemimage_set.first }}"></a></th>
                     <th><a href="{% url 'post' item.url_code %}">{{ item.title }}</a></th>
                     <th><div class="text-nowrap">{{ item.category.kor_name }}</div></th>
                     <th><div class="text-nowrap">{{ item.city }}</div></th>
                     <th>{{ item.postview_set.all.count }}</th>
-                    <th><div class="text-nowrap">{{ item.pub_date }}</div></th>
+                    <th><div class="text-nowrap">{{ item.pub_date|date:"m/d/y"  }}</div></th>
                     {% if item.is_removed or item.is_expired %}
                     <th><a href="{% url 'post_repost' item.url_code %}">repost</a></th>
                     {% else %}

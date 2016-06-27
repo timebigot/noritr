@@ -41,29 +41,6 @@
     {% load tags %}
     <body>
 
-        {% block messages %}
-        {% if messages %}
-        <section>
-            <br>
-            <div class="container">
-                {% for message in messages %}
-                <div{% if message.tags %} class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}" role="{{ message.tags }}"{% endif %}>
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                    {% if message.tags == 'success' %}
-                    <i class="fa fa-check" aria-hidden="true"></i>
-                    {% elif message.tags == 'error' %}
-                    <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
-                    {% endif %}
-                    {{ message }}
-                </div>
-                {% endfor %}
-            </div>
-        </section>
-        {% endif %}
-        {% endblock messages %}
-
         <header class="navbar-lg hidden-sm hidden-xs">
             <div class="container navbar-main">
                 <div class="row">
@@ -100,7 +77,7 @@
                     </div>
                     <div class="col-xs-3">
                         <div class="row">
-                            <div class="col-md-6 navbar-a" align="center">
+                            <div class="col-md-9 navbar-a" align="center">
                                 {% if user.is_authenticated %}
                                     <a class="dropdown-toggle" data-toggle="dropdown" href="" role="button" aria-haspopup="true" aria-expanded="false">
                                         <i class="fa fa-user" aria-hidden="true"></i> {{ user.username }} {% if user|unread_msg %} <span class="badge badge-red">{{ user|unread_msg }}</span> {% endif %}<span class="caret"></span>
@@ -118,8 +95,8 @@
                                 <a href="{% url 'join' %}">JOIN</a>
                                 {% endif %}
                             </div>
-                            <div class="col-md-6">
-                                <a href="{% url 'post_create' %}" class="btn btn-success btn-post" role="button">POST</a>
+                            <div class="col-md-3">
+                                <a href="{% url 'post_create' %}" class="btn btn-success btn-post pull-right" role="button">POST</a>
                             </div>
                         </div><!--pull-right-->
                     </div><!--col-xs-3-->
@@ -173,6 +150,29 @@
             </div>
             <hr class="navbar-border">
         </header>
+
+        {% block messages %}
+        {% if messages %}
+        <section>
+            <br>
+            <div class="container">
+                {% for message in messages %}
+                <div{% if message.tags %} class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}" role="{{ message.tags }}"{% endif %}>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    {% if message.tags == 'success' %}
+                    <i class="fa fa-check" aria-hidden="true"></i>
+                    {% elif message.tags == 'error' %}
+                    <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+                    {% endif %}
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+        {% endblock messages %}
 
         <main class="hidden-xs hidden-sm hidden-md hidden-lg" id="mainSearch">
         <div class="container" align="center">

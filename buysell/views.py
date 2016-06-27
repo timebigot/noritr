@@ -263,8 +263,8 @@ def post_process(request):
                                 img_name = url_coder(size=11)
                                 img_ext = os.path.splitext(img_filename)[1].lower()
                                 img_filename = img_name + img_ext
-                                img_filepath = os.path.join(img_filename)
-                                default_storage.save(img_filepath, ContentFile(image.read()))
+                                img_path = os.path.join(img_filename)
+                                default_storage.save(img_path, ContentFile(image.read()))
 
                                 img_db = ItemImage(name = img_filename, location = img_filename, item=item)
                                 img_db.save()
@@ -280,8 +280,8 @@ def post_process(request):
                                     thumb = thumb.crop((W-W, H-W, W+W, H+W))
                                     thumb = thumb.resize((350,350))
 
-                                thumb_filepath = 'thumb_' + img_filename
-                                f_thumb = default_storage.open(thumb_filepath, 'w')
+                                thumb_path = 'thumb_' + img_filename
+                                f_thumb = default_storage.open(thumb_path, 'w')
                                 thumb.save(f_thumb, 'png')
                                 f_thumb.close()
 

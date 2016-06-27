@@ -6,6 +6,7 @@ Message: {{ recipient }}
 {% block content %}
 {% load humanize %}
 {% load tags %}
+{% thumb_url as t_url %}
 
 <div class="container">
     <h3>Message: {{ recipient }}</h3>
@@ -21,7 +22,7 @@ Message: {{ recipient }}
                     <div class="media">
                         <div class="media-left">
                             <a href="{% url 'post' item.url_code %}">
-                                <img class="media-object inbox-media" src="/img/thumbs/{{ item.itemimage_set.first }}" alt="{{ item.title }}" width="128px">
+                                <img class="media-object inbox-media" src="{{ t_url }}{{ item.itemimage_set.first }}" alt="{{ item.title }}" width="128px">
                             </a>
                         </div>
                         <div class="media-body">

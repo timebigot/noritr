@@ -18,7 +18,7 @@ def get_cats():
 
 @register.filter
 def new_item(pub_date):
-    cur_time = time.time() 
+    cur_time = time.time()
     pub_time = format(pub_date, 'U')
 
     dif_time = int(cur_time) - int(pub_time)
@@ -58,10 +58,10 @@ def sent_msg(user):
 
 @register.simple_tag
 def img_url():
-    url = 'https://noritr-4989.s3.amazonaws.com/media/'
+    url = base_set.MEDIA_URL
     return url
 
 @register.simple_tag
 def thumb_url():
-    url = 'https://noritr-4989.s3.amazonaws.com/media/thumb_'
+    url = base_set.MEDIA_URL + 'thumb_'
     return url

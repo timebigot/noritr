@@ -75,3 +75,6 @@ media
 #test bot
 bot
 parser.py
+
+#mac trash
+.DS_Store

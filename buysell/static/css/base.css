@@ -62,7 +62,7 @@ header {
     margin-bottom: 5px;
 }
 .navbar-lg {
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 .navbar-xs {
     margin-bottom: 15px;
@@ -115,6 +115,11 @@ header {
 }
 .nav>li>.navcat-free {
     padding-right: 0px;
+}
+
+/* alert */
+.alert {
+    margin-top: -20px;
 }
 
 /* jumbotron */
@@ -187,6 +192,6 @@ footer {
     bottom: 0;
     height: 80px;
     width: 100%;
-    color: white;
-    background-color: #333;
+    color: #333;
+    background-color: white;
 }

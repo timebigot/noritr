@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% block title %}Create Post{% endblock %}
 {% block content %}
+{% load tags %}
 <div class="container">
     <div class="row">
         <div class="col-md-6 col-md-offset-3">
@@ -17,14 +18,14 @@
                         <div class="form-group">
                             <label class="col-sm-2" for="title">Title</label>
                             <div class="col-sm-10">
-                                <input type="text" name="title" class="form-control" id="title" maxlength="50" value="{{ item.title }}" autofocus>
+                                <input type="text" name="title" class="form-control" id="title" maxlength="50" value="{{ item.title }}" autofocus required>
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label class="col-sm-2" for="details">Details</label>
                             <div class="col-sm-10">
-                                <textarea name="details" rows="5" class="form-control" id="details">{{ item.details }}</textarea>
+                                <textarea name="details" rows="5" class="form-control" id="details" required>{{ item.details }}</textarea>
                             </div>
                         </div>
 
@@ -33,7 +34,7 @@
                             <div class="col-sm-4">
                                 <div class="input-group">
                                     <span class="input-group-addon">$</span>
-                                    <input type="number" class="form-control" id="price" name="price" value="{{ item.price }}" {% if repost or repost == False %}disabled{% endif %}>
+                                    <input type="number" class="form-control" id="price" name="price" value="{{ item.price }}" required {% if repost or repost == False %}disabled{% endif %}>
                                 </div>
                             </div>
                         </div>
@@ -41,7 +42,7 @@
                         <div class="form-group">
                             <label class="col-sm-2" for="category">Category</label>
                             <div class="col-sm-4">
-                                <select class="form-control" name="category">
+                                <select class="form-control" name="category" required>
                                     {% if item %}
                                     <option value="{{ item.category.eng_name }}">{{ item.category.kor_name }}</option>
                                     {% else %}
@@ -57,7 +58,7 @@
                         <div class="form-group">
                             <label class="col-sm-2" for="city">City</label>
                             <div class="col-sm-4">
-                                <select class="form-control" name="city">
+                                <select class="form-control" name="city" required>
                                     {% if item %}
                                     <option value="{{ item.city.slug }}">{{ item.city }}</option>
                                     {% else %}
@@ -80,8 +81,9 @@
                         {% else %}
                         <div class="row">
                             {% for image in item.itemimage_set.all %}
+                            {% thumb_url as t_url %}
                             <div class="col-md-4">
-                                <img class="img-responsive" src="{{ HTTP_HOST }}/img/thumbs/{{ image }}">
+                                <img class="img-responsive img-thumbnail" src="{{ t_url }}{{ image }}">
                             </div>
                             {% endfor %}
                         </div>
