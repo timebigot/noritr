@@ -116,7 +116,10 @@ header {
 .nav>li>.navcat-free {
     padding-right: 0px;
 }
-
+.list-group-item.active, .list-group-item.active:focus, .list-group-item.active:hover {
+    background-color: #5cb85c;
+    border-color: #eee;
+}
 /* alert */
 .alert {
     margin-top: -20px;

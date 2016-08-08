@@ -1,0 +1,14 @@
+{% for city in cities %}
+
+<h4>
+{{ city.name }}
+</h4>
+{% for bot in bots %}
+{% if bot.customer.zipcode.city == city %}
+{{ bot.username }}
+<br>
+{% endif %}
+{% endfor %}
+
+
+{% endfor %}

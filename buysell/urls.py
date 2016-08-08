@@ -25,6 +25,7 @@ urlpatterns = [
     url(r'^inbox/$', views.inbox, name='inbox'),
     url(r'^inbox/(?P<url_code>\w+)/$', views.inbox, name='thread'),
     url(r'^bot/$', views.bot, name='bot'),
+    url(r'^botlist/$', views.botlist, name='botlist'),
     url(r'^store/manage/$', views.store_manage, name='store_manage'),
     url(r'^store/(?P<seller>[^\/]+)/$', views.store, name='store'),
     url(r'^store/(?P<seller>[^\/]+)/(?P<page>\d+)/$', views.store, name='store_page'),
@@ -33,8 +34,3 @@ urlpatterns = [
     url(r'^favorites/$', views.favorites, name='favorites'),
     url(r'^favorites/(?P<page>\d+)/$', views.favorites, name='favorites_page'),
 ]
-
-if settings.DEBUG:
-    urlpatterns += patterns('', (r'^img/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}))
-else:
-    print('Production!')

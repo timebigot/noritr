@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}Noritr{% endblock %}
+{% block title %}Home{% endblock %}
 {% block content %}
 {% load staticfiles %}
 {% load tags %}
@@ -12,7 +12,7 @@
                     {% if user.is_authenticated %}
                     Welcome, {{ user }}!
                     {% else %}
-                    Welcome to 4989
+                    Welcome to Noritr
                     {% endif %}
                 </b>
             </h1>
@@ -21,6 +21,8 @@
 </div>
 <div class="container">
     <div class="row">
+
+        {% if items_rand %}
         <div class="container">
             <h3>
                 <i class="fa fa-certificate" aria-hidden="true"></i>
@@ -30,7 +32,9 @@
         {% for item in items_rand %}
         {% include "card.html" %}
         {% endfor %}
+        {% endif %}
 
+        {% if items_new %}
         <div class="container">
             <h3>
                 <i class="fa fa-history fa-flip-horizontal" aria-hidden="true"></i>
@@ -45,6 +49,7 @@
         {% for item in items_new %}
         {% include "card.html" %}
         {% endfor %}
+        {% endif %}
 
         {% if items_saved %}
         <div class="container">

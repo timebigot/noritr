@@ -57,6 +57,7 @@ class Zipcode(models.Model):
 class Customer(models.Model):
     user = models.OneToOneField(User)
     zipcode = models.ForeignKey(Zipcode, on_delete=models.CASCADE, default='')
+    is_bot = models.BooleanField(default=False)
     #picture = models.ImageField(upload_to='profile_images', blank=True)
 
     def __str__(self):

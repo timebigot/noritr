@@ -19,6 +19,7 @@ from parser import missy_parser
 from django.contrib import messages
 from urllib.request import urlopen
 from io import BytesIO
+from pyzipcode import Pyzipcode as pz
 
 def index(request):
     if request.user.is_authenticated():
@@ -56,21 +57,38 @@ def sign_up(request):
         password = request.POST.get('password')
         zipcode = request.POST.get('zipcode')
 
+        zip_object = pz.get(zipcode, "US")
+        city = zip_object['city']
+        state = zip_object['state']
+
         if User.objects.filter(username=username).exists():
             messages.error(request, 'Username is taken')
+            return render(request, 'join.html')
 
         if User.objects.filter(email=email).exists():
             messages.error(request, 'Email in use')
+            return render(request, 'join.html')
 
-        try:
+        if not State.objects.filter(name=state).exists():
+            messages.error(request, 'This area is not supported yet. Here is a list: click here')
+            return render(request, 'join.html')
+
+        if Zipcode.objects.filter(number=zipcode).exists():
             zipcode = Zipcode.objects.get(number=zipcode)
-        except:
-            messages.error(request, 'Area not supported')
         else:
-            user = User.objects.create_user(username, email, password)
-            add = Customer(user=user, zipcode=zipcode)
-            add.save()
-            messages.success(request, 'Account created!')
+            if City.objects.filter(name=city).exists():
+                city = City.objects.get(name=city)
+            else:
+                state = State.objects.get(name=state)
+                city = City(name=city, state=state, slug='yes')
+                city.save()
+                zipcode = Zipcode(number=zipcode, city=city)
+                zipcode.save()
+
+        user = User.objects.create_user(username, email, password)
+        add_user = Customer(user=user, zipcode=zipcode)
+        add_user.save()
+        messages.success(request, 'Account created! Please sign in!')
         return render(request, 'join.html')
     else:
         return redirect('/')
@@ -79,9 +97,10 @@ def log_in(request):
     next = request.GET.get('next')
 
     if request.method == 'POST':
-        username = request.POST.get('username')
+        email = request.POST.get('email')
         password = request.POST.get('password')
 
+        username = User.objects.get(email=email).username
         user = authenticate(username=username, password=password)
 
         if user is not None:
@@ -504,6 +523,21 @@ def bot(request):
             states = Area.objects.get(slug=area).states.all()
             cities = City.objects.filter(state__in=states).order_by('name')
             return render(request, 'bot.html', {'categories': categories, 'cities': cities})
+    else:
+        return redirect('/')
+
+@login_required
+def botlist(request):
+    if request.user.is_superuser:
+        bots = []
+        custs = Customer.objects.filter(is_bot=True)
+        for cust in custs:
+            bot = User.objects.get(username=cust.user.username)
+            bots.append(bot)
+
+        cities = City.objects.all()
+
+        return render(request, 'botlist.html', {'bots': bots, 'cities': cities})
     else:
         return redirect('/')
 
